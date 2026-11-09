@@ -143,6 +143,10 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 #stage .ctrl{display:flex;gap:16px}
 #stage .ctrl button{width:76px;height:76px;border-radius:50%;background:rgba(255,255,255,.18);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);font-size:15px;font-weight:500;color:#fff}
 #stage .ctrl button:active{background:rgba(255,255,255,.3)}
+#stage.paused .clock{opacity:.45}
+#stage .ctrl button[hidden]{display:none}
+.today-sum{display:flex;justify-content:center;gap:6px;font-size:15px;color:var(--label2);margin:4px 0 0}
+.today-sum b{color:var(--label);font-weight:600;font-variant-numeric:tabular-nums}
 
 /* check-in card */
 #cardModal{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:calc(env(safe-area-inset-top) + 16px) 20px calc(env(safe-area-inset-bottom) + 16px);background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
@@ -218,7 +222,7 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
     <div class="phase" id="stagePhase"></div>
     <div class="clock" id="stageClock">25:00</div>
     <div class="track"><i id="stageTrack"></i></div>
-    <div class="ctrl"><button id="stagePause">暂停</button><button id="stageStop">结束</button></div>
+    <div class="ctrl"><button id="stagePause">暂停</button><button id="stageMore">+5 分钟</button><button id="stageStop">结束</button></div>
   </div>
 </div>
 
@@ -251,7 +255,7 @@ const TARGET = /*TARGET*/'pwa'; // 'artifact' when built for the Claude page
 const LS = 'xiulian.v1', LT = 'xiulian.timer', LP = 'xiulian.pending';
 const WEEK = ['日','一','二','三','四','五','六'];
 
-function defState(){ return {v:1,goals:{l:60,r:30,s:20},base:{l:50,r:60,s:35},entries:[],seen:[],collected:{},last:null,pomo:{focus:25,rest:5,k:'l'},photos:[]}; }
+function defState(){ return {v:1,goals:{l:60,r:30,s:20},base:{l:50,r:60,s:35},entries:[],seen:[],collected:{},last:null,pomo:{focus:25,rest:5,long:15,mode:'pomo',k:'l'},photos:[]}; }
 // fill in anything missing (older saves, older backups) with defaults
 function normalize(s){ const d=defState(); const o=Object.assign(d,s,{goals:Object.assign(d.goals,s.goals),base:Object.assign(d.base,s.base),pomo:Object.assign(d.pomo,s.pomo)}); if(!Array.isArray(o.photos)) o.photos=[]; delete o.timer; return o; }
 function lsGet(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } }
@@ -420,9 +424,9 @@ function randPhotoId(){ return photos.length? photos[Math.floor(Math.random()*ph
 function setPhoto(el,id){ const u=id&&photoUrl(id); el.style.backgroundImage=u?'url("'+u+'")':''; el.classList.toggle('empty',!u); }
 
 /* ---------- entries ---------- */
-function addEntry(k,m,src,day){
+function addEntry(k,m,src,day,extra){
   const before=val(k);
-  S.entries.push({id:uid(),d:day||today(),k,m,t:Date.now(),src});
+  S.entries.push(Object.assign({id:uid(),d:day||today(),k,m,t:Date.now(),src},extra||{}));
   const after=val(k), pi=pickPoem();
   if(!S.collected[pi]) S.collected[pi]=today();
   S.last={pi,d:today()};
@@ -463,16 +467,23 @@ function renderToday(){
   }
   $('v-today').innerHTML=h;
 }
+function focusToday(){ let n=0, m=0; for(const e of S.entries) if(e.d===today() && (e.src==='pomo'||e.src==='free')){ m+=e.m; if(e.full) n++; } return {n,m}; }
 function renderFocus(){
-  const P=S.pomo;
-  let h='<div class="lt">专注</div><div class="sub">番茄钟结束后，时间自动记进所选的一项</div>';
-  h+='<div class="seg" role="tablist">'+ORDER.map(k=>'<button class="'+(P.k===k?'on':'')+'" data-pk="'+k+'" role="tab" aria-selected="'+(P.k===k)+'">'+SK[k].name+'</button>').join('')+'</div>';
+  const P=S.pomo, free=P.mode==='free', ft=focusToday();
+  let h='<div class="lt">专注</div><div class="sub">'+(free? '想学多久学多久，结束时把时间记进所选的一项' : '番茄钟结束后，时间自动记进所选的一项')+'</div>';
+  h+='<div class="seg" role="tablist" aria-label="计时方式">'+[['pomo','番茄钟'],['free','正计时']].map(([m,t])=>'<button class="'+(P.mode===m?'on':'')+'" data-pmode="'+m+'" role="tab" aria-selected="'+(P.mode===m)+'">'+t+'</button>').join('')+'</div>';
+  h+='<div class="seg" role="tablist" aria-label="练习项目" style="margin-top:8px">'+ORDER.map(k=>'<button class="'+(P.k===k?'on':'')+'" data-pk="'+k+'" role="tab" aria-selected="'+(P.k===k)+'">'+SK[k].name+'</button>').join('')+'</div>';
   const r=118, circ=2*Math.PI*r;
-  h+='<div class="face"><svg viewBox="0 0 260 260" aria-hidden="true"><circle cx="130" cy="130" r="'+r+'" fill="none" stroke="var(--fill)" stroke-width="8"/><circle cx="130" cy="130" r="'+r+'" fill="none" stroke="'+SK[P.k].c+'" stroke-width="8" stroke-linecap="round" stroke-dasharray="'+circ+' '+circ+'" transform="rotate(-90 130 130)"/></svg><div class="t"><b>'+String(P.focus).padStart(2,'0')+':00</b><small>'+SK[P.k].name+' · 休息 '+P.rest+' 分钟</small></div></div>';
-  h+='<div class="card" style="margin-top:14px"><div class="row"><span class="grow">专注时长</span><span class="val">'+P.focus+' 分钟</span><span class="stepper"><button data-step="focus:-5" aria-label="减少专注时长">−</button><button data-step="focus:5" aria-label="增加专注时长">+</button></span></div>';
-  h+='<div class="row"><span class="grow">休息时长</span><span class="val">'+P.rest+' 分钟</span><span class="stepper"><button data-step="rest:-1" aria-label="减少休息时长">−</button><button data-step="rest:1" aria-label="增加休息时长">+</button></span></div></div>';
-  h+='<div style="margin-top:22px"><button class="primary" id="startFocus">开始专注</button></div>';
-  h+='<div class="gf">'+(photos.length? '专注时背景会随机显示你的 '+photos.length+' 张照片和一句诗词。' : '还没有照片。到「记录 › 背景照片」从相册添加，专注时就会用它们做背景。')+'</div>';
+  h+='<div class="face"><svg viewBox="0 0 260 260" aria-hidden="true"><circle cx="130" cy="130" r="'+r+'" fill="none" stroke="var(--fill)" stroke-width="8"/>'+(free?'':'<circle cx="130" cy="130" r="'+r+'" fill="none" stroke="'+SK[P.k].c+'" stroke-width="8" stroke-linecap="round" stroke-dasharray="'+circ+' '+circ+'" transform="rotate(-90 130 130)"/>')+'</svg><div class="t"><b>'+(free? '00:00' : String(P.focus).padStart(2,'0')+':00')+'</b><small>'+SK[P.k].name+(free? ' · 从 0 开始计时' : ' · 休息 '+P.rest+' 分钟')+'</small></div></div>';
+  h+='<div class="today-sum">今天'+(ft.n? ' <b>'+ft.n+'</b> 个番茄 ·' : '')+' 专注 <b>'+fmtMin(ft.m)+'</b></div>';
+  if(!free){
+    h+='<div class="card" style="margin-top:14px">';
+    h+='<div class="row"><span class="grow">专注时长</span><span class="val">'+P.focus+' 分钟</span><span class="stepper"><button data-step="focus:-5" aria-label="减少专注时长">−</button><button data-step="focus:5" aria-label="增加专注时长">+</button></span></div>';
+    h+='<div class="row"><span class="grow">短休息</span><span class="val">'+P.rest+' 分钟</span><span class="stepper"><button data-step="rest:-1" aria-label="减少短休息">−</button><button data-step="rest:1" aria-label="增加短休息">+</button></span></div>';
+    h+='<div class="row"><span class="grow">长休息<br><small style="color:var(--label2);font-size:13px">每完成 4 个番茄</small></span><span class="val">'+P.long+' 分钟</span><span class="stepper"><button data-step="long:-5" aria-label="减少长休息">−</button><button data-step="long:5" aria-label="增加长休息">+</button></span></div></div>';
+  }
+  h+='<div style="margin-top:22px"><button class="primary" id="startFocus">'+(free?'开始计时':'开始专注')+'</button></div>';
+  h+='<div class="gf">'+(free? '计时到 3 小时会自动暂停，问你还在不在学。' : '专注时可以随时暂停，快结束时可以再加 5 分钟。')+' '+(photos.length? '背景会随机显示你的 '+photos.length+' 张照片和一句诗词。' : '到「记录 › 背景照片」添加照片，专注时就用它们做背景。')+'</div>';
   $('v-focus').innerHTML=h;
 }
 function radarSVG(){
@@ -540,7 +551,7 @@ function renderLog(){
     if(openDay===d){
       h+='<div class="day-entries">';
       S.entries.filter(e=>e.d===d).sort((a,b)=>a.t-b.t).forEach(e=>{ const tt=new Date(e.t);
-        h+='<div class="entry"><span class="ico" style="background:'+SK[e.k].c+';width:20px;height:20px;border-radius:5px;font-size:11px">'+SK[e.k].name[0]+'</span><span class="grow">'+String(tt.getHours()).padStart(2,'0')+':'+String(tt.getMinutes()).padStart(2,'0')+' · '+(e.src==='pomo'?'番茄钟':'手动')+'</span><span class="num">'+e.m+' 分</span><button data-del="'+e.id+'">删除</button></div>'; });
+        h+='<div class="entry"><span class="ico" style="background:'+SK[e.k].c+';width:20px;height:20px;border-radius:5px;font-size:11px">'+SK[e.k].name[0]+'</span><span class="grow">'+String(tt.getHours()).padStart(2,'0')+':'+String(tt.getMinutes()).padStart(2,'0')+' · '+({pomo:'番茄钟',free:'正计时'}[e.src]||'手动')+'</span><span class="num">'+e.m+' 分</span><button data-del="'+e.id+'">删除</button></div>'; });
       h+='</div>';
     }
   });
@@ -618,8 +629,8 @@ function showCard(res, afterFocus){
   cardAfterFocus=!!afterFocus;
   const d=new Date();
   let h='<div class="qcard"><div class="photo" id="cardPhoto"></div><div class="shade"></div>'+poemHTML(res.pi);
-  h+='<div class="info"><span class="stamp">'+d.getFullYear()+'.'+(d.getMonth()+1)+'.'+d.getDate()+' · 打卡</span><b>'+SK[res.k].name+' +'+res.m+' 分钟</b><span>'+SK[res.k].name+'修为 '+res.before.toFixed(2)+' → '+res.after.toFixed(2)+'</span></div></div>';
-  h+='<div class="card-actions">'+(afterFocus?'<button class="alt" data-card="rest">休息 '+S.pomo.rest+' 分钟</button>':'')+'<button data-card="done">完成</button></div>';
+  h+='<div class="info"><span class="stamp">'+d.getFullYear()+'.'+(d.getMonth()+1)+'.'+d.getDate()+' · '+(res.round? '今天第 '+res.round+' 个番茄' : '打卡')+'</span><b>'+SK[res.k].name+' +'+res.m+' 分钟</b><span>'+SK[res.k].name+'修为 '+res.before.toFixed(2)+' → '+res.after.toFixed(2)+'</span></div></div>';
+  h+='<div class="card-actions">'+(afterFocus?'<button class="alt" data-card="rest">'+(nextRest>S.pomo.rest?'长休息 ':'休息 ')+nextRest+' 分钟</button>':'')+'<button data-card="done">完成</button></div>';
   $('cardModal').innerHTML=h; setPhoto($('cardPhoto'), randPhotoId());
   $('cardModal').classList.add('on');
 }
@@ -641,47 +652,82 @@ function chime(){
 }
 async function lockOn(){ try{ if('wakeLock' in navigator) wake=await navigator.wakeLock.request('screen'); }catch(e){ wake=null; } }
 function lockOff(){ try{ wake&&wake.release(); }catch(e){} wake=null; }
-function startPhase(phase){
+const FREE_CAP=3*3600000; // a stopwatch left running pauses itself here
+let nextRest=5;
+const isFree=T=>T.mode==='free' && T.phase==='focus';
+function leftMs(T){ T=T||TM; return T.left!=null? T.left : T.end-Date.now(); } // countdown
+function elapsedMs(T){ T=T||TM; return isFree(T)? (T.left!=null? T.left : Date.now()-T.start) : T.total-leftMs(T); }
+function roundsToday(){ return focusToday().n; }
+function clockText(sec){ const h=Math.floor(sec/3600), m=Math.floor(sec%3600/60), x=sec%60; return (h? h+':'+String(m).padStart(2,'0') : String(m).padStart(2,'0'))+':'+String(x).padStart(2,'0'); }
+function startPhase(phase,min){
   ensureAudio();
-  const min= phase==='focus'? S.pomo.focus : S.pomo.rest, ms=min*60000;
-  TM={phase,k:S.pomo.k,total:ms,end:Date.now()+ms,left:null,photo:randPhotoId(),poem:anyPoem()};
+  const P=S.pomo, free= phase==='focus' && P.mode==='free';
+  min=min||(phase==='focus'? P.focus : P.rest);
+  const ms=free? 0 : min*60000, now=Date.now();
+  TM={phase,mode:free?'free':'pomo',k:P.k,total:ms,end:now+ms,start:now,left:null,photo:randPhotoId(),poem:anyPoem(),round:(phase==='focus'&&!free)? roundsToday()+1 : 0};
   saveT(); openStage();
 }
 function openStage(){
   const T=TM; if(!T) return;
   setPhoto($('stagePhoto'), T.photo && photoUrl(T.photo) ? T.photo : randPhotoId());
   $('stagePoem').innerHTML=poemHTML(T.poem||0);
-  $('stagePhase').textContent= T.phase==='focus'? '专注 · '+SK[T.k].name : '休息一下';
+  $('stagePhase').textContent= T.phase==='rest'? (T.total>S.pomo.rest*60000? '长休息' : '休息一下') : isFree(T)? '正计时 · '+SK[T.k].name : '专注 · '+SK[T.k].name+(T.round? ' · 第 '+T.round+' 个番茄' : '');
+  $('stageMore').hidden= T.phase!=='focus' || isFree(T);
+  $('stageStop').textContent= T.phase==='rest'? '跳过' : '结束';
   $('stage').classList.add('on'); lockOn();
   clearInterval(tickT); tickT=setInterval(tick,250); tick();
 }
-function closeStage(){ clearInterval(tickT); tickT=null; $('stage').classList.remove('on'); lockOff(); }
-function leftMs(){ const T=TM; return T.left!=null? T.left : T.end-Date.now(); }
+function closeStage(){ clearInterval(tickT); tickT=null; $('stage').classList.remove('on','paused'); lockOff(); document.title='日语修行'; }
+function pauseToggle(){
+  const T=TM; if(!T) return;
+  if(isFree(T)){ if(T.left==null) T.left=Date.now()-T.start; else { T.start=Date.now()-T.left; T.left=null; } }
+  else { if(T.left==null) T.left=T.end-Date.now(); else { T.end=Date.now()+T.left; T.left=null; } }
+  saveT(); tick();
+}
 function tick(){
   const T=TM; if(!T){ closeStage(); return; }
-  const left=leftMs();
-  if(left<=0){ finishPhase(); return; }
-  const sec=Math.ceil(left/1000);
-  $('stageClock').textContent=String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0');
-  $('stageTrack').style.width=((1-left/T.total)*100).toFixed(2)+'%';
+  let sec;
+  if(isFree(T)){
+    const el=elapsedMs(T);
+    if(el>=FREE_CAP && T.left==null && !T.capAsked){ T.capAsked=true; pauseToggle(); chime(); stopEarly('已经计时 3 小时，还在学吗？'); return; }
+    sec=Math.floor(el/1000);
+    $('stageTrack').style.width=(el%3600000/36000).toFixed(2)+'%'; // one lap per hour
+  } else {
+    const left=leftMs(); if(left<=0){ finishPhase(); return; }
+    sec=Math.ceil(left/1000);
+    $('stageTrack').style.width=((1-left/T.total)*100).toFixed(2)+'%';
+  }
+  const txt=clockText(sec);
+  $('stageClock').textContent=txt;
   $('stagePause').textContent= T.left!=null? '继续' : '暂停';
+  $('stage').classList.toggle('paused', T.left!=null);
+  document.title=txt+' · '+(T.phase==='rest'? '休息' : SK[T.k].name);
 }
 function finishPhase(){
   const T=TM; TM=null; saveT(); closeStage(); chime();
-  if(T.phase==='focus'){ const res=addEntry(T.k, Math.round(T.total/60000), 'pomo'); showCard(res,true); }
-  else toast('休息结束，继续加油');
+  if(T.phase==='focus'){
+    // dated by when it ended, even if the app was closed past midnight
+    const res=addEntry(T.k, Math.round(T.total/60000), 'pomo', dkey(new Date(T.end)), {t:T.end, full:1});
+    const n=roundsToday(); nextRest= n>0 && n%4===0 ? S.pomo.long : S.pomo.rest; res.round=n;
+    showCard(res,true);
+  } else {
+    dialog('休息结束','准备好了就开始下一个番茄。',[{t:'再专注 '+S.pomo.focus+' 分钟',cls:'b',fn:()=>{ S.pomo.mode='pomo'; save(); startPhase('focus'); }},{t:'先不了'}]);
+  }
 }
-function stopEarly(){
+function stopEarly(title){
   const T=TM; if(!T) return;
   if(T.phase==='rest'){ TM=null; saveT(); closeStage(); return; }
-  const was=T.left; if(T.left==null){ T.left=leftMs(); saveT(); tick(); }
-  const done=Math.floor((T.total-T.left)/60000);
-  const resume=()=>{ if(was==null){ T.end=Date.now()+T.left; T.left=null; saveT(); tick(); } };
-  if(done<1){ dialog('结束这次专注？','还不到 1 分钟，不会记录时间。',[{t:'结束',cls:'d',fn:()=>{ TM=null; saveT(); closeStage(); }},{t:'继续专注',cls:'b',fn:resume}]); return; }
-  dialog('结束这次专注？','已经专注了 '+done+' 分钟。',[
-    {t:'记录 '+done+' 分钟',cls:'b',fn:()=>{ TM=null; saveT(); closeStage(); const res=addEntry(T.k,done,'pomo'); showCard(res,false); }},
-    {t:'不记录',cls:'d',fn:()=>{ TM=null; saveT(); closeStage(); }},
-    {t:'继续专注',fn:resume}
+  const free=isFree(T), wasRunning=T.left==null||!!title;
+  if(T.left==null) pauseToggle();
+  const done=Math.floor(elapsedMs(T)/60000), src=free?'free':'pomo';
+  const resume=()=>{ if(wasRunning && TM===T && T.left!=null) pauseToggle(); };
+  const end=()=>{ TM=null; saveT(); closeStage(); };
+  const word=free?'计时':'专注';
+  if(done<1){ dialog(title||'结束这次'+word+'？','还不到 1 分钟，不会记录时间。',[{t:'结束',cls:'d',fn:end},{t:'继续'+word,cls:'b',fn:resume}]); return; }
+  dialog(title||'结束这次'+word+'？','已经'+word+'了 '+fmtMin(done)+'。',[
+    {t:'记录 '+fmtMin(done),cls:'b',fn:()=>{ end(); const res=addEntry(T.k,Math.min(done,600),src); showCard(res,false); }},
+    {t:'不记录',cls:'d',fn:end},
+    {t:'继续'+word,fn:resume}
   ]);
 }
 
@@ -720,11 +766,13 @@ document.addEventListener('click',e=>{
   if(ds.add){ addK=ds.add; addM=15; addDay=0; openSheet('add'); return; }
   if(ds.reopen){ reopenCard(); return; }
   if(ds.pk){ S.pomo.k=ds.pk; save(); renderFocus(); return; }
-  if(ds.step){ const [f,n]=ds.step.split(':'); const lim=f==='focus'?[5,120]:[1,30]; S.pomo[f]=Math.max(lim[0],Math.min(lim[1],S.pomo[f]+Number(n))); save(); renderFocus(); return; }
+  if(ds.pmode){ S.pomo.mode=ds.pmode; save(); renderFocus(); return; }
+  if(ds.step){ const [f,n]=ds.step.split(':'); const lim={focus:[5,120],rest:[1,30],long:[5,60]}[f]; S.pomo[f]=Math.max(lim[0],Math.min(lim[1],S.pomo[f]+Number(n))); save(); renderFocus(); return; }
   if(b.id==='startFocus'){ startPhase('focus'); return; }
-  if(b.id==='stagePause'){ const T=TM; if(!T) return; if(T.left==null){ T.left=leftMs(); } else { T.end=Date.now()+T.left; T.left=null; } saveT(); tick(); return; }
+  if(b.id==='stagePause'){ pauseToggle(); return; }
+  if(b.id==='stageMore'){ const T=TM; if(!T||isFree(T)||T.phase!=='focus') return; T.total+=300000; if(T.left!=null) T.left+=300000; else T.end+=300000; saveT(); tick(); toast('多专注 5 分钟'); return; }
   if(b.id==='stageStop'){ stopEarly(); return; }
-  if(ds.card){ $('cardModal').classList.remove('on'); if(ds.card==='rest') startPhase('rest'); return; }
+  if(ds.card){ $('cardModal').classList.remove('on'); if(ds.card==='rest') startPhase('rest',nextRest); return; }
   if(ds.day){ openDay= openDay===ds.day? null : ds.day; renderLog(); return; }
   if(ds.del){ const i=S.entries.findIndex(x=>x.id===ds.del); if(i<0) return; const [gone]=S.entries.splice(i,1); save(); render(); toast('已删除 '+gone.m+' 分钟',()=>{ S.entries.push(gone); save(); render(); }); return; }
   if(ds.undo){ if(undoFn) undoFn(); undoFn=null; $('toast').classList.remove('on'); return; }
