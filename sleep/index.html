@@ -7,18 +7,19 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="睡眠">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="theme-color" content="#13121a">
+<meta name="theme-color" content="#17121a">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" href="icon-192.png">
 <title>睡眠记录</title>
 <style>
 :root{
-  /* same layout language as 日语修行 (large titles, inset cards, bottom tabs), moved from dusk to night:
-     ink-blue black, moonlight gold, periwinkle. Single dark theme on purpose - it is used in the dark. */
-  --bg:#13121a; --card:#1e1c27; --fill:rgba(230,228,255,.08); --fill2:rgba(230,228,255,.15);
-  --label:#ecebf4; --label2:#9d9ab0; --label3:#666377; --sep:#302e3c;
-  --accent:#9aa6ff; --moon:#f2cf7e; --mauve:#b48fc0; --danger:#ff6b6b;
+  /* same layout language as 日语修行 (large titles, inset cards, bottom tabs).
+     colour: a pink-violet sunset seen through classroom windows - coral-pink sky, peach glow, cream horizon,
+     lavender clouds, dark window frames and silhouettes in front. Single dark theme on purpose: it is used at night. */
+  --bg:#17121a; --card:#231b26; --fill:rgba(255,226,236,.08); --fill2:rgba(255,226,236,.15);
+  --label:#f6eaee; --label2:#ab97a5; --label3:#715f6c; --sep:#3a2e3c;
+  --accent:#f293a6; --moon:#f9dca0; --mauve:#b394d6; --danger:#ff6b6b; --frame:#120d14;
   --ui:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Hiragino Sans GB","Noto Sans SC",system-ui,sans-serif;
   --serif:"Songti SC","STSong","Noto Serif SC",serif;
   color-scheme:dark;
@@ -44,18 +45,42 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 .row .val{color:var(--label2);font-variant-numeric:tabular-nums;white-space:nowrap}
 .chev{color:var(--label3);font-size:20px;line-height:1}
 .tap:active{background:var(--fill)}
-.primary{display:block;width:100%;background:var(--accent);color:#13121a;border-radius:14px;padding:15px;font-size:17px;font-weight:600;text-align:center}
+.primary{display:block;width:100%;background:var(--accent);color:#17121a;border-radius:14px;padding:15px;font-size:17px;font-weight:600;text-align:center}
 .primary:active,.secondary:active{opacity:.8}
 .secondary{display:block;width:100%;background:var(--fill);color:var(--accent);border-radius:14px;padding:15px;font-size:17px;font-weight:600;text-align:center}
 .btns{display:flex;flex-direction:column;gap:10px;margin-top:16px}
 .danger{color:var(--danger)}
 
-/* the 24h dial */
-.dial{position:relative;display:grid;place-items:center;margin:8px 0 4px}
-.dial svg{width:min(76vw,290px);height:min(76vw,290px)}
+/* the classroom window: sunset sky (night sky while asleep), frames and a skyline, the dial on dark glass */
+.window{border-radius:14px;overflow:hidden;background:var(--card)}
+.pane{position:relative;padding:34px 0 48px;overflow:hidden}
+.pane .sky{position:absolute;inset:0;background:
+  radial-gradient(ellipse 34% 7% at 16% 38%,rgba(108,87,114,.8),transparent 70%),
+  radial-gradient(ellipse 26% 5% at 30% 46%,rgba(127,98,156,.65),transparent 70%),
+  radial-gradient(ellipse 40% 8% at 82% 30%,rgba(108,87,114,.6),transparent 70%),
+  radial-gradient(ellipse 30% 6% at 76% 60%,rgba(127,98,156,.75),transparent 70%),
+  radial-gradient(ellipse 60% 22% at 22% 84%,rgba(255,244,214,.7),transparent 70%),
+  linear-gradient(180deg,#8d6fb0 0%,#c693bf 22%,#e28190 48%,#f0a49c 66%,#f8c9aa 82%,#f9ecb3 100%)}
+.window.night .pane .sky{background:
+  radial-gradient(circle at 12% 18%,#fff 0 1px,transparent 1.6px),radial-gradient(circle at 84% 12%,#fff 0 1.2px,transparent 1.8px),
+  radial-gradient(circle at 72% 34%,rgba(255,255,255,.8) 0 .8px,transparent 1.4px),radial-gradient(circle at 26% 52%,rgba(255,255,255,.7) 0 .8px,transparent 1.4px),
+  radial-gradient(circle at 92% 50%,rgba(255,255,255,.8) 0 1px,transparent 1.6px),radial-gradient(circle at 50% 8%,rgba(255,255,255,.6) 0 .8px,transparent 1.4px),
+  radial-gradient(ellipse 36% 6% at 20% 70%,rgba(127,98,156,.35),transparent 70%),
+  linear-gradient(180deg,#120e20 0%,#211936 40%,#3e2c55 76%,#6a4566 100%)}
+.pane i{position:absolute;background:var(--frame)}
+.pane .mv{top:0;bottom:0;width:6px}
+.pane .mh{left:0;right:0;top:17%;height:6px}
+.pane .city{position:absolute;left:0;right:0;bottom:0;height:34px;background:var(--frame);
+  clip-path:polygon(0 70%,6% 70%,6% 45%,11% 45%,11% 62%,19% 62%,19% 30%,22% 30%,22% 58%,34% 58%,34% 74%,46% 74%,46% 52%,52% 52%,52% 66%,63% 66%,63% 40%,67% 40%,67% 22%,69% 22%,69% 40%,72% 40%,72% 60%,84% 60%,84% 48%,90% 48%,90% 68%,100% 68%,100% 100%,0 100%)}
+.pane::after{content:"";position:absolute;inset:0;border:6px solid var(--frame);border-bottom:0;border-radius:14px 14px 0 0;pointer-events:none}
+.sill{padding:12px 16px 14px;border-top:.5px solid var(--sep)}
+.sill .hint{margin:0}
+.dial{position:relative;z-index:1;display:grid;place-items:center}
+.dial::before{content:"";position:absolute;width:calc(min(66vw,250px) * .9);aspect-ratio:1;border-radius:50%;background:rgba(23,16,26,.52);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 10px 30px rgba(18,10,22,.35)}
+.dial svg{position:relative;width:min(66vw,250px);height:min(66vw,250px)}
 .dial .t{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:2px;text-align:center}
 .dial .t small{font-size:14px;color:var(--label2)}
-.dial .t b{font-size:min(14vw,56px);font-weight:200;font-variant-numeric:tabular-nums;letter-spacing:.01em;line-height:1.1}
+.dial .t b{font-size:min(12vw,48px);font-weight:200;font-variant-numeric:tabular-nums;letter-spacing:.01em;line-height:1.1}
 .dial .t span{font-size:15px;color:var(--label2);font-variant-numeric:tabular-nums}
 .hint{text-align:center;font-size:14px;color:var(--label2);margin:4px 0 0}
 .hint b{color:var(--moon);font-weight:600}
@@ -81,7 +106,7 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 /* trends */
 .seg{display:flex;background:var(--fill);border-radius:9px;padding:2px;gap:2px}
 .seg button{flex:1;padding:6px 0;border-radius:7px;font-size:14px;font-weight:500}
-.seg button.on{background:#3a3850;box-shadow:0 3px 8px rgba(0,0,0,.25)}
+.seg button.on{background:#45343f;box-shadow:0 3px 8px rgba(0,0,0,.25)}
 .chart{padding:14px 12px 10px}
 .chart h4{margin:0 4px;font-size:15px;font-weight:600}
 .readout{margin:2px 4px 8px;font-size:13px;color:var(--label2);min-height:18px;font-variant-numeric:tabular-nums}
@@ -124,13 +149,13 @@ input[type=datetime-local]{min-width:0;max-width:62vw}
 .quality button.on span{filter:none}
 .chips{display:flex;flex-wrap:wrap;gap:8px;padding:12px}
 .chip{background:var(--fill);border-radius:18px;padding:7px 14px;font-size:14px}
-.chip.on{background:var(--accent);color:#13121a;font-weight:500}
+.chip.on{background:var(--accent);color:#17121a;font-weight:500}
 textarea{display:block;width:100%;font:inherit;font-size:16px;color:var(--label);background:transparent;border:0;resize:none;padding:12px 16px;min-height:76px;-webkit-user-select:text;user-select:text}
 textarea::placeholder{color:var(--label3)}
 .err{color:var(--danger);font-size:13px;text-align:center;min-height:18px;margin-top:8px}
 #toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 92px);transform:translate(-50%,20px);z-index:80;background:color-mix(in srgb,var(--label) 90%,transparent);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:15px;display:flex;gap:14px;align-items:center;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;white-space:nowrap}
 #toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
-#toast button{color:#4d5bd6;font-weight:600}
+#toast button{color:#c2456a;font-weight:600}
 
 /* tab bar */
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;justify-content:center;background:color-mix(in srgb,var(--bg) 78%,transparent);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-top:.5px solid var(--sep);padding-bottom:env(safe-area-inset-bottom)}
@@ -263,7 +288,7 @@ function dial(start, end, live){
     const [x,y] = P(c,c,r,deg(dayMin(end)));
     if(live) dots = `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" fill="var(--bg)"/>`;
   }
-  return `<svg viewBox="0 0 240 240" aria-hidden="true"><circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="var(--fill)" stroke-width="14"/>${goal}${main}${dots}${ticks}${lbl}</svg>`;
+  return `<svg viewBox="0 0 240 240" aria-hidden="true"><circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="rgba(255,226,236,.1)" stroke-width="14"/>${goal}${main}${dots}${ticks}${lbl}</svg>`;
 }
 
 /* ---------- views ---------- */
@@ -275,19 +300,19 @@ function renderHome(){
   let h = `<h1 class="lt">睡眠</h1><p class="sub">${d.getMonth()+1}月${d.getDate()}日 周${WD[d.getDay()]} · 目标 ${durTxt(S.goal)}</p>`;
   if(S.active){
     const m = (now - S.active.start) / MIN;
-    h += `<div class="card pad"><div class="dial">${dial(S.active.start, now, true)}<div class="t"><small>已经睡了</small><b>${durShort(m)}</b><span>${hm(S.active.start)} 入睡</span></div></div>
-      <p class="hint">目标 <b>${S.wake}</b> 起床 · ${m < S.goal ? `再睡 ${durTxt(S.goal - m)} 就够了` : '已经睡够了'}</p></div>
+    h += `<div class="window night"><div class="pane"><div class="sky"></div><i class="mv" style="left:24%"></i><i class="mv" style="left:29%"></i><i class="mv" style="left:66%"></i><i class="mh"></i><div class="city"></div><div class="dial">${dial(S.active.start, now, true)}<div class="t"><small>已经睡了</small><b>${durShort(m)}</b><span>${hm(S.active.start)} 入睡</span></div></div></div>
+      <div class="sill"><p class="hint">目标 <b>${S.wake}</b> 起床 · ${m < S.goal ? `再睡 ${durTxt(S.goal - m)} 就够了` : '已经睡够了'}</p></div></div>
       <div class="btns"><button class="primary" data-act="wake">起床了</button><button class="secondary" data-act="cancel">取消这次</button></div>`;
   } else {
     const last = S.recs[0];
     if(last){
       const m = mins(last), diff = Math.round(m - S.goal);
       const when = dkey(last.end) === dkey(now) ? '昨晚' : dlabel(last.end);
-      h += `<div class="card pad"><div class="dial">${dial(last.start, last.end)}<div class="t"><small>${when}</small><b>${durShort(m)}</b><span>${hm(last.start)} → ${hm(last.end)}</span></div></div>
-        <p class="hint">${last.q ? PHASE[last.q-1]+' '+QNAME[last.q-1]+' · ' : ''}${diff >= 0 ? '达到目标' + (diff ? `，多睡 ${durTxt(diff)}` : '') : `比目标少 ${durTxt(-diff)}`}</p></div>`;
+      h += `<div class="window"><div class="pane"><div class="sky"></div><i class="mv" style="left:24%"></i><i class="mv" style="left:29%"></i><i class="mv" style="left:66%"></i><i class="mh"></i><div class="city"></div><div class="dial">${dial(last.start, last.end)}<div class="t"><small>${when}</small><b>${durShort(m)}</b><span>${hm(last.start)} → ${hm(last.end)}</span></div></div></div>
+        <div class="sill"><p class="hint">${last.q ? PHASE[last.q-1]+' '+QNAME[last.q-1]+' · ' : ''}${diff >= 0 ? '达到目标' + (diff ? `，多睡 ${durTxt(diff)}` : '') : `比目标少 ${durTxt(-diff)}`}</p></div></div>`;
     } else {
-      h += `<div class="card pad"><div class="dial">${dial(null)}<div class="t"><small>还没有记录</small><b>—</b><span>${S.bed} → ${S.wake}</span></div></div>
-        <p class="hint">睡前点“开始睡觉”，醒来点“起床了”</p></div>`;
+      h += `<div class="window"><div class="pane"><div class="sky"></div><i class="mv" style="left:24%"></i><i class="mv" style="left:29%"></i><i class="mv" style="left:66%"></i><i class="mh"></i><div class="city"></div><div class="dial">${dial(null)}<div class="t"><small>还没有记录</small><b>—</b><span>${S.bed} → ${S.wake}</span></div></div></div>
+        <div class="sill"><p class="hint">睡前点“开始睡觉”，醒来点“起床了”</p></div></div>`;
     }
     const left = (tmin(S.bed) - dayMin(now) + 1440) % 1440;
     const hint = left <= 180 ? `离目标入睡还有 <b>${durTxt(left)}</b>` : left >= 1440 - 240 ? `已过目标入睡时间 <b>${durTxt(1440 - left)}</b>` : '';
@@ -358,7 +383,7 @@ function durChart(days, W){
     b += `<path d="${topRounded(x.toFixed(1)*1, y(v), bw, y(0)-y(v), 4)}" fill="var(--accent)" opacity="${sel < 0 || sel === i ? 1 : .35}"/>`;
   });
   const gy = y(goalH).toFixed(1);
-  g += `<line x1="${padL}" x2="${W-padR}" y1="${gy}" y2="${gy}" stroke="var(--moon)" stroke-width="1.2" stroke-dasharray="4 4"/><text x="${W-padR}" y="${gy-4}" text-anchor="end" style="fill:var(--moon)">目标 ${durShort(S.goal)}</text>`;
+  g += `<line x1="${padL}" x2="${W-padR}" y1="${gy}" y2="${gy}" stroke="var(--moon)" stroke-width="1.2" stroke-dasharray="4 4"/><text x="${W-padR}" y="${gy-4}" text-anchor="end" style="fill:var(--moon);paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">目标 ${durShort(S.goal)}</text>`;
   return `<svg viewBox="0 0 ${W} ${H}" height="${H}" data-chart data-padl="${padL}" data-cw="${cw}">${g}${b}${xLabels(days, cw, padL, H)}</svg>`;
 }
 function timeChart(days, W){
@@ -377,7 +402,7 @@ function timeChart(days, W){
     g += `<line x1="${padL}" x2="${W-padR}" y1="${y(m).toFixed(1)}" y2="${y(m).toFixed(1)}" stroke="var(--sep)" stroke-width=".5"/><text x="${padL-6}" y="${(y(m)+3.5).toFixed(1)}" text-anchor="end">${clock(m+720)}</text>`;
   }
   for(const [m, t] of [[bedT, '目标入睡'], [wakeT, '目标起床']]){
-    g += `<line x1="${padL}" x2="${W-padR}" y1="${y(m).toFixed(1)}" y2="${y(m).toFixed(1)}" stroke="var(--moon)" stroke-width="1.2" stroke-dasharray="4 4"/><text x="${W-padR}" y="${(y(m)-4).toFixed(1)}" text-anchor="end" style="fill:var(--moon)">${t}</text>`;
+    g += `<line x1="${padL}" x2="${W-padR}" y1="${y(m).toFixed(1)}" y2="${y(m).toFixed(1)}" stroke="var(--moon)" stroke-width="1.2" stroke-dasharray="4 4"/><text x="${W-padR}" y="${(y(m)-4).toFixed(1)}" text-anchor="end" style="fill:var(--moon);paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round">${t}</text>`;
   }
   let b = '';
   days.forEach((d, i) => {
