@@ -115,6 +115,22 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 .entry button{color:var(--danger);font-size:14px;padding:4px 8px}
 .segs{display:flex;height:6px;width:64px;border-radius:3px;overflow:hidden;background:var(--fill);flex:none}
 .segs i{display:block;height:100%}
+.pnav{display:flex;align-items:center;justify-content:space-between;margin:12px 0 10px}
+.pnav b{font-size:17px;font-weight:600}
+.pnav button,.pnav span{width:44px;height:36px;font-size:26px;line-height:1;color:var(--accent);display:grid;place-items:center}
+.pnav button:active{opacity:.5}
+.statbig .tot{padding:16px 16px 4px;display:flex;flex-direction:column;gap:2px}
+.statbig .tot small{font-size:13px;color:var(--label2)}
+.statbig .tot b{font-size:30px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.15}
+.statbig .tot span{font-size:13px;color:var(--label2)}
+.statbig .trio{border-top:.5px solid var(--sep);margin-top:10px}
+.statbig .trio b small{font-size:13px;color:var(--label2);font-weight:400}
+.share .grow{display:flex;flex-direction:column;gap:6px}
+.share .sh{display:flex;justify-content:space-between;gap:8px}
+.row .bar{margin-top:6px}
+.met{font-size:11px;font-weight:600;color:var(--good);border:1px solid currentColor;border-radius:5px;padding:0 4px;margin-left:4px;vertical-align:2px}
+.heat-legend{display:flex;align-items:center;gap:4px;justify-content:flex-end;font-size:11px;color:var(--label2);margin-top:8px}
+.heat-legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
 
 /* tab bar */
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;justify-content:center;background:color-mix(in srgb,var(--bg) 78%,transparent);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-top:.5px solid var(--sep);padding-bottom:env(safe-area-inset-bottom)}
@@ -518,36 +534,80 @@ function renderSkill(){
   $('v-skill').innerHTML=h;
 }
 let openDay=null;
-function chartSVG(){
-  const W=340, H=150, n=14, bw=14, gap=(W-24-n*bw)/(n-1), base=new Date();
-  const days=[]; for(let i=n-1;i>=0;i--) days.push(dkey(addD(base,-i)));
-  const goal=S.goals.l+S.goals.r+S.goals.s;
-  let max=Math.max(goal,...days.map(d=>minsOn(d))); max=Math.ceil(max/30)*30||30;
-  const y=v=>12+(H-40)*(1-v/max);
-  let s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="近 14 天每日练习时间">';
-  s+='<line x1="0" x2="'+W+'" y1="'+y(goal).toFixed(1)+'" y2="'+y(goal).toFixed(1)+'" stroke="var(--label3)" stroke-dasharray="3 4"/>';
-  s+='<text x="'+W+'" y="'+(y(goal)-4).toFixed(1)+'" text-anchor="end" font-size="10" fill="var(--label2)">目标 '+goal+'</text>';
-  s+='<text x="0" y="10" font-size="10" fill="var(--label2)">'+max+' 分</text>';
-  days.forEach((d,i)=>{
-    const x=12+i*(bw+gap); let acc=0;
-    ORDER.forEach(k=>{ const m=minsOn(d,k); if(!m) return; const y0=y(acc), y1=y(acc+m); s+='<rect x="'+x.toFixed(1)+'" y="'+y1.toFixed(1)+'" width="'+bw+'" height="'+Math.max(1,(y0-y1)).toFixed(1)+'" fill="'+SK[k].c+'"/>'; acc+=m; });
-    if(!acc) s+='<rect x="'+x.toFixed(1)+'" y="'+(y(0)-2)+'" width="'+bw+'" height="2" rx="1" fill="var(--fill2)"/>';
-    const dt=pkey(d);
-    if(i%2===(n-1)%2) s+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-size="10" fill="'+(i===n-1?'var(--accent)':'var(--label2)')+'" font-weight="'+(i===n-1?'600':'400')+'">'+(i===n-1?'今天':dt.getDate())+'</text>';
+/* ---------- statistics: week / month / year / all ---------- */
+let statP=(['week','month','year','all'].indexOf(lsGet('xiulian.statP'))>=0? lsGet('xiulian.statP') : 'month'), statOff=0;
+const MILESTONES=[10,25,50,100,200,300,500,800,1000,1500,2000,3000];
+function dayMap(){ const M=new Map(); for(const e of S.entries){ let o=M.get(e.d); if(!o){ o={l:0,r:0,s:0,t:0}; M.set(e.d,o); } o[e.k]+=e.m; o.t+=e.m; } return M; }
+function goalMet(o){ return !!o && ORDER.every(k=>o[k]>=S.goals[k]); }
+function daysBetween(a,b){ return Math.round((pkey(dkey(b))-pkey(dkey(a)))/864e5); }
+function firstDay(){ let f=today(); for(const e of S.entries) if(e.d<f) f=e.d; return pkey(f); }
+function periodRange(p,off){
+  const now=pkey(today());
+  if(p==='week'){ const st=addD(now,-((now.getDay()+6)%7)+7*off); return [st,addD(st,6)]; }
+  if(p==='month'){ const st=new Date(now.getFullYear(),now.getMonth()+off,1); return [st,new Date(st.getFullYear(),st.getMonth()+1,0)]; }
+  if(p==='year'){ const y=now.getFullYear()+off; return [new Date(y,0,1),new Date(y,11,31)]; }
+  return [firstDay(),now];
+}
+function periodLabel(p,off,a,b){
+  const md=d=>(d.getMonth()+1)+'月'+d.getDate()+'日';
+  if(p==='week') return off===0? '本周' : off===-1? '上周' : md(a)+' – '+(a.getMonth()===b.getMonth()? b.getDate()+'日' : md(b));
+  if(p==='month') return off===0? '本月' : (a.getFullYear()!==new Date().getFullYear()? a.getFullYear()+'年' : '')+(a.getMonth()+1)+'月';
+  if(p==='year') return off===0? '今年' : a.getFullYear()+'年';
+  return '全部 · 从 '+a.getFullYear()+'年'+md(a);
+}
+function sumRange(M,a,b){
+  const r={l:0,r:0,s:0,t:0,days:0,goal:0,best:null,bestD:null};
+  for(let d=new Date(a); d<=b; d=addD(d,1)){ const k=dkey(d), o=M.get(k); if(!o||!o.t) continue;
+    ORDER.forEach(x=>r[x]+=o[x]); r.t+=o.t; r.days++; if(goalMet(o)) r.goal++; if(!r.best||o.t>r.best){ r.best=o.t; r.bestD=k; } }
+  return r;
+}
+function streaks(M){
+  const days=[...M.keys()].filter(k=>M.get(k).t>0).sort(); let best=0, run=0, prev=null;
+  for(const k of days){ run= prev && daysBetween(pkey(prev),pkey(k))===1 ? run+1 : 1; if(run>best) best=run; prev=k; }
+  return {best, cur:streak()};
+}
+// stacked bars; items: [{label, l, r, s, hi, go}] in minutes
+function barsSVG(items,opt){
+  const W=340, H=168, n=items.length, top=16, bot=24, inner=W-28;
+  const slot=inner/n, bw=Math.max(3,Math.min(22,slot*.62)), hours=opt.hours;
+  const tot=it=>it.l+it.r+it.s;
+  let max=Math.max(opt.goal||0,...items.map(tot)); const step=hours? 60 : 30; max=Math.ceil(max/step)*step||step;
+  const y=v=>top+(H-top-bot)*(1-v/max);
+  let s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(opt.aria)+'">';
+  s+='<text x="0" y="10" font-size="10" fill="var(--label2)">'+(hours? fmtH(max)+' 小时' : max+' 分')+'</text>';
+  s+='<line x1="24" x2="'+W+'" y1="'+y(0)+'" y2="'+y(0)+'" stroke="var(--sep)"/>';
+  if(opt.goal){ const gy=y(opt.goal).toFixed(1); s+='<line x1="24" x2="'+W+'" y1="'+gy+'" y2="'+gy+'" stroke="var(--label3)" stroke-dasharray="3 4"/><text x="'+W+'" y="'+(gy-4)+'" text-anchor="end" font-size="10" fill="var(--label2)">每日目标 '+opt.goal+'</text>'; }
+  items.forEach((it,i)=>{
+    const x=28+i*slot+(slot-bw)/2; let acc=0;
+    ORDER.forEach(k=>{ const m=it[k]; if(!m) return; const y0=y(acc), y1=y(acc+m); s+='<rect x="'+x.toFixed(1)+'" y="'+y1.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+Math.max(1,y0-y1).toFixed(1)+'" fill="'+SK[k].c+'"/>'; acc+=m; });
+    if(!acc) s+='<rect x="'+x.toFixed(1)+'" y="'+(y(0)-2)+'" width="'+bw.toFixed(1)+'" height="2" rx="1" fill="var(--fill2)"/>';
+    if(it.label!=='') s+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(H-8)+'" text-anchor="middle" font-size="10" fill="'+(it.hi?'var(--accent)':'var(--label2)')+'" font-weight="'+(it.hi?600:400)+'">'+esc(it.label)+'</text>';
   });
   return s+'</svg>';
 }
-function renderLog(){
-  const all=minsAll();
-  let h='<div class="lt">记录</div><div class="sub">累计 '+fmtMin(all)+'</div>';
-  h+='<div class="card trio">'+ORDER.map(k=>'<div><small style="color:'+SK[k].c+';font-weight:600">'+SK[k].name+'</small><b>'+fmtH(minsAll(k))+'</b><small>小时</small></div>').join('')+'</div>';
-  h+='<div class="gt">近 14 天</div><div class="card pad chart">'+chartSVG()+'</div>';
-  const days=[...new Set(S.entries.map(e=>e.d))].sort().reverse().slice(0,60);
-  h+='<div class="gt">每日记录</div><div class="card">';
-  if(!days.length) h+='<div class="row"><span class="grow" style="color:var(--label2)">还没有记录。去「今天」记一笔，或开一个番茄钟。</span></div>';
+// one square per day for a whole year, darker = closer to the daily goal
+function heatSVG(M,year){
+  const a=new Date(year,0,1), b=new Date(year,11,31), lead=(a.getDay()+6)%7, cols=Math.ceil((lead+daysBetween(a,b)+1)/7);
+  const W=340, cs=Math.min(12,(W-20)/cols), sz=cs-1.5, top=14, goal=S.goals.l+S.goals.r+S.goals.s, now=pkey(today());
+  let s='<svg viewBox="0 0 '+W+' '+(top+7*cs+2)+'" role="img" aria-label="'+year+' 年每日练习日历">';
+  ['一','三','五'].forEach((w,i)=>{ s+='<text x="0" y="'+(top+(i*2)*cs+sz-1)+'" font-size="8" fill="var(--label3)">'+w+'</text>'; });
+  for(let m=0;m<12;m++){ const d=new Date(year,m,1), c=Math.floor((lead+daysBetween(a,d))/7); s+='<text x="'+(14+c*cs)+'" y="9" font-size="9" fill="var(--label2)">'+(m+1)+'</text>'; }
+  for(let d=new Date(a); d<=b; d=addD(d,1)){
+    const i=lead+daysBetween(a,d), c=Math.floor(i/7), r=i%7, o=M.get(dkey(d)), t=o? o.t : 0;
+    const fut=d>now, lv= !t? 0 : t>=goal? 4 : t>=goal*.66? 3 : t>=goal*.33? 2 : 1;
+    const fill= lv? 'var(--accent)' : 'var(--fill)', op=[1,.28,.5,.75,1][lv];
+    s+='<rect x="'+(14+c*cs).toFixed(1)+'" y="'+(top+r*cs).toFixed(1)+'" width="'+sz.toFixed(1)+'" height="'+sz.toFixed(1)+'" rx="2" fill="'+fill+'" fill-opacity="'+(fut?.35:op)+'"/>';
+  }
+  return s+'</svg>';
+}
+function heatLegend(){ return '<div class="heat-legend">少<i style="background:var(--fill)"></i>'+[.28,.5,.75,1].map(o=>'<i style="background:var(--accent);opacity:'+o+'"></i>').join('')+'多 · 最深 = 达到每日目标</div>'; }
+function dayRows(M,a,b){
+  const days=[...M.keys()].filter(k=>k>=dkey(a)&&k<=dkey(b)&&M.get(k).t>0).sort().reverse();
+  let h='';
+  if(!days.length) h+='<div class="row"><span class="grow" style="color:var(--label2)">'+(S.entries.length? '这段时间没有记录。' : '还没有记录。去「今天」记一笔，或开一个番茄钟。')+'</span></div>';
   days.forEach(d=>{
-    const dt=pkey(d), tot=minsOn(d);
-    h+='<button class="row tap" data-day="'+d+'" aria-expanded="'+(openDay===d)+'"><span class="grow">'+(d===today()?'今天':(dt.getMonth()+1)+'月'+dt.getDate()+'日 周'+WEEK[dt.getDay()])+'</span><span class="segs">'+ORDER.map(k=>'<i style="width:'+(minsOn(d,k)/tot*100)+'%;background:'+SK[k].c+'"></i>').join('')+'</span><span class="val">'+fmtMin(tot)+'</span><span class="chev">'+(openDay===d?'⌄':'›')+'</span></button>';
+    const dt=pkey(d), o=M.get(d), tot=o.t;
+    h+='<button class="row tap" data-day="'+d+'" aria-expanded="'+(openDay===d)+'"><span class="grow">'+(d===today()?'今天':(dt.getMonth()+1)+'月'+dt.getDate()+'日 周'+WEEK[dt.getDay()])+(goalMet(o)?' <span class="met">达标</span>':'')+'</span><span class="segs">'+ORDER.map(k=>'<i style="width:'+(o[k]/tot*100)+'%;background:'+SK[k].c+'"></i>').join('')+'</span><span class="val">'+fmtMin(tot)+'</span><span class="chev">'+(openDay===d?'⌄':'›')+'</span></button>';
     if(openDay===d){
       h+='<div class="day-entries">';
       S.entries.filter(e=>e.d===d).sort((a,b)=>a.t-b.t).forEach(e=>{ const tt=new Date(e.t);
@@ -555,7 +615,81 @@ function renderLog(){
       h+='</div>';
     }
   });
+  return h;
+}
+function statsHTML(){
+  const M=dayMap(), P=statP, [a,b]=periodRange(P,statOff), now=pkey(today());
+  const R=sumRange(M,a,b), last=b<now? b : now, span=a>now? 0 : daysBetween(a,last)+1;
+  let h='<div class="seg" role="tablist" aria-label="统计范围" style="margin-top:4px">'+[['week','周'],['month','月'],['year','年'],['all','全部']].map(([k,t])=>'<button class="'+(P===k?'on':'')+'" data-statp="'+k+'" role="tab" aria-selected="'+(P===k)+'">'+t+'</button>').join('')+'</div>';
+  h+='<div class="pnav">'+(P==='all'? '<span></span>' : '<button data-statnav="-1" aria-label="上一段">‹</button>')+'<b>'+periodLabel(P,statOff,a,b)+'</b>'+(P==='all'||statOff>=0? '<span></span>' : '<button data-statnav="1" aria-label="下一段">›</button>')+'</div>';
+  // headline numbers
+  let cmp='';
+  if(P!=='all'){ const [pa,pb]=periodRange(P,statOff-1), PR=sumRange(M,pa,pb), word={week:'上周',month:'上月',year:'去年'}[P];
+    // compare like with like: the same number of days into the previous period
+    const pl=addD(pa,Math.max(0,span-1)), PRs= statOff===0? sumRange(M,pa,pl<pb?pl:pb) : PR;
+    if(PRs.t>0){ const ch=Math.round((R.t-PRs.t)/PRs.t*100); cmp=(statOff===0? '比'+word+'同期' : '比'+word)+(ch>=0? '多 '+ch+'%' : '少 '+(-ch)+'%'); }
+    else if(R.t>0) cmp=word+(statOff===0?'同期':'')+'没有记录'; }
+  h+='<div class="card statbig"><div class="tot"><small>总时长</small><b>'+fmtMin(R.t)+'</b>'+(cmp?'<span>'+cmp+'</span>':'')+'</div>';
+  h+='<div class="trio"><div><b>'+R.days+'<small> / '+span+'</small></b><small>练习天数</small></div><div><b>'+(span? Math.round(R.t/span) : 0)+'<small> 分钟</small></b><small>日均</small></div><div><b>'+R.goal+'</b><small>达标天数</small></div></div></div>';
+  // chart
+  let chart='';
+  if(P==='week'){ const it=[]; for(let i=0;i<7;i++){ const d=addD(a,i), o=M.get(dkey(d))||{l:0,r:0,s:0}; it.push({label:'一二三四五六日'[i],l:o.l,r:o.r,s:o.s,hi:dkey(d)===today()}); }
+    chart=barsSVG(it,{goal:S.goals.l+S.goals.r+S.goals.s,aria:'每天练习时间'}); }
+  else if(P==='month'){ const it=[], n=b.getDate(); for(let i=1;i<=n;i++){ const d=new Date(a.getFullYear(),a.getMonth(),i), o=M.get(dkey(d))||{l:0,r:0,s:0}; it.push({label:(i===1||i%5===0)&&i<=n-2||i===n? String(i):'',l:o.l,r:o.r,s:o.s,hi:dkey(d)===today()}); }
+    chart=barsSVG(it,{goal:S.goals.l+S.goals.r+S.goals.s,aria:'每天练习时间'}); }
+  else if(P==='year'){ const it=[]; for(let m=0;m<12;m++){ const ma=new Date(a.getFullYear(),m,1), mr=sumRange(M,ma,new Date(a.getFullYear(),m+1,0)); it.push({label:String(m+1),l:mr.l,r:mr.r,s:mr.s,hi:statOff===0&&m===now.getMonth()}); }
+    chart=barsSVG(it,{hours:true,aria:'每月练习时间'}); }
+  else { const months=(now.getFullYear()-a.getFullYear())*12+now.getMonth()-a.getMonth()+1, it=[];
+    if(months<=24){ let ly=null; for(let i=0;i<months;i++){ const ma=new Date(a.getFullYear(),a.getMonth()+i,1), mr=sumRange(M,ma,new Date(ma.getFullYear(),ma.getMonth()+1,0)), show=months<=12||(months-1-i)%3===0;
+        // a labelled month carries its year whenever the year changes
+        let lab=''; if(show){ lab=(ma.getFullYear()!==ly? String(ma.getFullYear()).slice(2)+'/' : '')+(ma.getMonth()+1); ly=ma.getFullYear(); }
+        it.push({label:lab,l:mr.l,r:mr.r,s:mr.s,hi:i===months-1}); } }
+    else { for(let y=a.getFullYear();y<=now.getFullYear();y++){ const yr=sumRange(M,new Date(y,0,1),new Date(y,11,31)); it.push({label:String(y),l:yr.l,r:yr.r,s:yr.s,hi:y===now.getFullYear()}); } }
+    chart=barsSVG(it,{hours:true,aria:'每月练习时间'}); }
+  h+='<div class="card pad chart" style="margin-top:12px">'+chart+'</div>';
+  if(P==='year') h+='<div class="card pad chart" style="margin-top:12px">'+heatSVG(M,a.getFullYear())+heatLegend()+'</div>';
+  // split by skill
+  h+='<div class="gt">三项占比</div><div class="card">';
+  ORDER.forEach(k=>{ const pct=R.t? R[k]/R.t*100 : 0;
+    h+='<div class="row share"><span class="ico" style="background:'+SK[k].c+'">'+SK[k].name[0]+'</span><span class="grow"><span class="sh"><span>'+SK[k].name+'</span><span class="val">'+fmtMin(R[k])+' · '+Math.round(pct)+'%</span></span><span class="bar"><i style="width:'+pct.toFixed(1)+'%;background:'+SK[k].c+'"></i></span></span></div>'; });
   h+='</div>';
+  if(R.best) h+='<div class="gf">这段时间单日最多 '+fmtMin(R.best)+'（'+(pkey(R.bestD).getMonth()+1)+'月'+pkey(R.bestD).getDate()+'日）。</div>';
+  // what's inside the period
+  if(P==='week'||P==='month'){ h+='<div class="gt">每日记录</div><div class="card">'+dayRows(M,a,b)+'</div>'; }
+  else if(P==='year'){
+    h+='<div class="gt">每月</div><div class="card">'; let any=false;
+    for(let m=11;m>=0;m--){ const ma=new Date(a.getFullYear(),m,1); if(ma>now) continue; const mr=sumRange(M,ma,new Date(a.getFullYear(),m+1,0)); if(!mr.t) continue; any=true;
+      const off=(a.getFullYear()-now.getFullYear())*12+m-now.getMonth();
+      h+='<button class="row tap" data-gomonth="'+off+'"><span class="grow">'+(m+1)+'月<br><small style="color:var(--label2);font-size:13px">练习 '+mr.days+' 天 · 达标 '+mr.goal+' 天</small></span><span class="segs">'+ORDER.map(k=>'<i style="width:'+(mr[k]/mr.t*100)+'%;background:'+SK[k].c+'"></i>').join('')+'</span><span class="val">'+fmtMin(mr.t)+'</span><span class="chev">›</span></button>'; }
+    if(!any) h+='<div class="row"><span class="grow" style="color:var(--label2)">这一年没有记录。</span></div>';
+    h+='</div>';
+  } else {
+    h+='<div class="gt">每年</div><div class="card">';
+    for(let y=now.getFullYear();y>=a.getFullYear();y--){ const yr=sumRange(M,new Date(y,0,1),new Date(y,11,31)); if(!yr.t) continue;
+      h+='<button class="row tap" data-goyear="'+(y-now.getFullYear())+'"><span class="grow">'+y+'年<br><small style="color:var(--label2);font-size:13px">练习 '+yr.days+' 天</small></span><span class="val">'+fmtMin(yr.t)+'</span><span class="chev">›</span></button>'; }
+    if(!S.entries.length) h+='<div class="row"><span class="grow" style="color:var(--label2)">还没有记录。</span></div>';
+    h+='</div>';
+  }
+  return h;
+}
+function recordsHTML(){
+  const M=dayMap(), all=minsAll(), hrs=all/60, st=streaks(M);
+  let best=null, bestD=null; M.forEach((o,k)=>{ if(!best||o.t>best){ best=o.t; bestD=k; } });
+  const nx=MILESTONES.find(x=>x>hrs), pv=[0,...MILESTONES].filter(x=>x<=hrs).pop();
+  let pomos=0, free=0; for(const e of S.entries){ if(e.full) pomos++; if(e.src==='free') free+=e.m; }
+  let h='<div class="gt">纪录</div><div class="card">';
+  h+='<div class="row"><span class="grow">累计 '+fmtH(all)+' 小时<br><small style="color:var(--label2);font-size:13px">'+(nx? '距离 '+nx+' 小时还差 '+fmtMin(nx*60-all) : '已经超过 '+MILESTONES[MILESTONES.length-1]+' 小时')+'</small>'+(nx?'<span class="bar"><i style="width:'+((hrs-pv)/(nx-pv)*100).toFixed(1)+'%"></i></span>':'')+'</span></div>';
+  h+='<div class="row"><span class="grow">最长连续</span><span class="val">'+st.best+' 天'+(st.cur? ' · 现在 '+st.cur+' 天' : '')+'</span></div>';
+  h+='<div class="row"><span class="grow">单日最多</span><span class="val">'+(best? fmtMin(best)+' · '+(pkey(bestD).getMonth()+1)+'月'+pkey(bestD).getDate()+'日' : '—')+'</span></div>';
+  h+='<div class="row"><span class="grow">完成的番茄</span><span class="val">'+pomos+' 个'+(free? ' · 正计时 '+fmtMin(free) : '')+'</span></div>';
+  h+='</div>';
+  return h;
+}
+function renderLog(){
+  const all=minsAll();
+  let h='<div class="lt">记录</div><div class="sub">累计 '+fmtMin(all)+'</div>';
+  h+=statsHTML();
+  h+=recordsHTML();
   const nc=Object.keys(S.collected).length;
   h+='<div class="gt">诗签</div><div class="card"><button class="row tap" data-open="poems"><span class="grow">已收集的诗词</span><span class="val">'+nc+' / '+POEMS.length+'</span><span class="chev">›</span></button></div>';
   h+='<div class="gt">设置</div><div class="card">';
@@ -774,6 +908,10 @@ document.addEventListener('click',e=>{
   if(b.id==='stageStop'){ stopEarly(); return; }
   if(ds.card){ $('cardModal').classList.remove('on'); if(ds.card==='rest') startPhase('rest',nextRest); return; }
   if(ds.day){ openDay= openDay===ds.day? null : ds.day; renderLog(); return; }
+  if(ds.statp){ statP=ds.statp; statOff=0; openDay=null; lsSet('xiulian.statP',statP); renderLog(); return; }
+  if(ds.statnav){ statOff=Math.min(0,statOff+Number(ds.statnav)); openDay=null; renderLog(); return; }
+  if(ds.gomonth!=null){ statP='month'; statOff=Number(ds.gomonth); openDay=null; renderLog(); window.scrollTo(0,0); return; }
+  if(ds.goyear!=null){ statP='year'; statOff=Number(ds.goyear); renderLog(); window.scrollTo(0,0); return; }
   if(ds.del){ const i=S.entries.findIndex(x=>x.id===ds.del); if(i<0) return; const [gone]=S.entries.splice(i,1); save(); render(); toast('已删除 '+gone.m+' 分钟',()=>{ S.entries.push(gone); save(); render(); }); return; }
   if(ds.undo){ if(undoFn) undoFn(); undoFn=null; $('toast').classList.remove('on'); return; }
   if(ds.open){ openSheet(ds.open); return; }
