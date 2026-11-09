@@ -13,3 +13,4 @@
 - 地址：GitHub Pages 站点下的 `sleep/`，用 Safari 打开后“添加到主屏幕”
 - 直接改 `sleep/index.html`，不需要构建；改完把 `sleep/sw.js` 里的 `CACHE` 版本号加一，已安装的手机才会更新
 - 图标由 `python3 source/sleep_icons.py` 生成（需要 Pillow）
+- 首页窗户里的照片 `sleep/bg-classroom.jpg` 来自小红书 @September47_
