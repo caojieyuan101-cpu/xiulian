@@ -245,7 +245,9 @@ const LS = 'xiulian.v1';
 const WEEK = ['日','一','二','三','四','五','六'];
 
 function defState(){ return {v:1,goals:{l:60,r:30,s:20},base:{l:50,r:60,s:35},entries:[],seen:[],collected:{},last:null,pomo:{focus:25,rest:5,k:'l'},timer:null}; }
-function load(){ try{ const s=JSON.parse(localStorage.getItem(LS)); if(s&&s.v===1){ const d=defState(); return Object.assign(d,s,{goals:Object.assign(d.goals,s.goals),base:Object.assign(d.base,s.base),pomo:Object.assign(d.pomo,s.pomo)}); } }catch(e){} return defState(); }
+// fill in anything missing (older saves, older backups) with defaults
+function normalize(s){ const d=defState(); return Object.assign(d,s,{goals:Object.assign(d.goals,s.goals),base:Object.assign(d.base,s.base),pomo:Object.assign(d.pomo,s.pomo)}); }
+function load(){ try{ const s=JSON.parse(localStorage.getItem(LS)); if(s&&s.v===1) return normalize(s); }catch(e){} return defState(); }
 let S = load();
 function save(){ try{ localStorage.setItem(LS, JSON.stringify(S)); }catch(e){ toast('保存失败：手机存储空间不足'); } }
 try{ navigator.storage && navigator.storage.persist && navigator.storage.persist(); }catch(e){}
@@ -611,7 +613,7 @@ async function importData(file){
     const o=JSON.parse(await file.text()); const st=o&&o.state;
     if(!st || st.v!==1 || !Array.isArray(st.entries)) throw 0;
     dialog('从备份恢复？','备份里有 '+st.entries.length+' 条记录，会替换现在的记录。',[
-      {t:'恢复',cls:'b',fn:()=>{ const d=defState(); S=Object.assign(d,st,{timer:null}); save(); closeSheet(); render(); toast('已恢复'); }},
+      {t:'恢复',cls:'b',fn:()=>{ S=normalize(Object.assign({},st,{timer:null})); save(); closeSheet(); render(); toast('已恢复'); }},
       {t:'取消'}]);
   }catch(e){ toast('这不是有效的备份文件'); }
 }

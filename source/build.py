@@ -6,7 +6,10 @@ from PIL import Image, ImageDraw
 ROOT = os.path.dirname(os.path.abspath(__file__))
 SRC = ROOT
 DIST = os.path.dirname(ROOT)  # site files live at the repo root
-FONTDIR = os.environ.get('FONTDIR', '/home/claude/fontsrc/package/files')  # npm pack @fontsource/noto-serif-sc@5.1.1
+# npm pack @fontsource/noto-serif-sc@5.1.1, unpack, and point FONTDIR at package/files
+FONTDIR = os.environ.get('FONTDIR', os.path.join(ROOT, 'fontsrc', 'package', 'files'))
+if not glob.glob(os.path.join(FONTDIR, 'noto-serif-sc-*-400-normal.woff2')):
+    raise SystemExit('找不到字体：%s\n先运行 npm pack @fontsource/noto-serif-sc@5.1.1 并解压，再用 FONTDIR 指定 package/files 目录' % FONTDIR)
 os.makedirs(DIST, exist_ok=True)
 
 poems = json.load(open(os.path.join(SRC, 'poems.json'), encoding='utf-8'))
