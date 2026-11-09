@@ -23,6 +23,8 @@ for t, a, ti in poems:
 for r in realms:
     chars |= set(r)
 chars |= set('《》·')
+# titles, the seal and the big numbers are set in the serif too
+chars |= set('今天专注修为记录分钟小时天个0123456789./:%')
 chars = {c for c in chars if not c.isspace()}
 
 faces = []
@@ -73,28 +75,36 @@ if not os.path.exists(os.path.join(ART, 'data.json')):
     open(os.path.join(ART, 'data.json'), 'w', encoding='utf-8').write('{"v":1}')
 print('artifact/index.html', round(os.path.getsize(os.path.join(ART, 'index.html')) / 1024), 'KB')
 
-# icons: a radar triangle on deep indigo
+# icons: the radar triangle over a sunset sky, a city wall in silhouette
 def icon(size):
     S = 1024
     img = Image.new('RGB', (S, S))
     px = img.load()
-    top, bot = (64, 56, 140), (22, 18, 48)
+    stops = [(0, (95, 86, 108)), (.38, (155, 122, 133)), (.62, (217, 100, 74)), (.8, (236, 138, 74)), (1, (241, 178, 74))]
     for y in range(S):
         t = y / S
-        c = tuple(int(top[i] * (1 - t) + bot[i] * t) for i in range(3))
+        for (a, ca), (b, cb) in zip(stops, stops[1:]):
+            if a <= t <= b:
+                u = (t - a) / (b - a)
+                c = tuple(int(ca[i] * (1 - u) + cb[i] * u) for i in range(3))
+                break
         for x in range(S):
             px[x, y] = c
     d = ImageDraw.Draw(img, 'RGBA')
-    cx, cy, R = 512, 560, 330
+    wall = 800
+    d.rectangle([0, wall + 34, S, S], fill=(28, 23, 24, 255))
+    for x in range(20, S, 104):
+        d.rectangle([x, wall, x + 52, wall + 40], fill=(28, 23, 24, 255))
+    cx, cy, R = 512, 470, 290
     pts = lambda r: [(cx + r * math.cos(math.radians(a)), cy + r * math.sin(math.radians(a))) for a in (-90, 30, 150)]
     for r in (R * 0.4, R * 0.7):
-        d.polygon(pts(r), outline=(255, 255, 255, 70), width=6)
-    d.polygon(pts(R), outline=(255, 255, 255, 235), width=14)
+        d.polygon(pts(r), outline=(255, 255, 255, 80), width=6)
+    d.polygon(pts(R), outline=(255, 255, 255, 240), width=14)
     vals = [0.78, 0.62, 0.5]
     inner = [(cx + R * v * math.cos(math.radians(a)), cy + R * v * math.sin(math.radians(a))) for v, a in zip(vals, (-90, 30, 150))]
-    d.polygon(inner, fill=(255, 120, 150, 150), outline=(255, 255, 255, 255), width=8)
-    for (x, y), col in zip(inner, [(125, 122, 255), (255, 159, 10), (255, 55, 95)]):
-        d.ellipse([x - 26, y - 26, x + 26, y + 26], fill=col + (255,), outline=(255, 255, 255, 255), width=8)
+    d.polygon(inner, fill=(255, 226, 160, 110), outline=(255, 255, 255, 255), width=8)
+    for (x, y), col in zip(inner, [(231, 212, 240), (255, 210, 122), (255, 138, 98)]):
+        d.ellipse([x - 24, y - 24, x + 24, y + 24], fill=col + (255,), outline=(255, 255, 255, 255), width=7)
     return img.resize((size, size), Image.LANCZOS)
 
 big = icon(1024)
@@ -104,7 +114,7 @@ for s in (180, 192, 512):
 manifest = {
     'name': '日语修行', 'short_name': '修行', 'lang': 'zh-CN',
     'start_url': './', 'scope': './', 'display': 'standalone',
-    'background_color': '#f2f2f7', 'theme_color': '#f2f2f7',
+    'background_color': '#1b1719', 'theme_color': '#1b1719',
     'icons': [
         {'src': 'icon-192.png', 'sizes': '192x192', 'type': 'image/png'},
         {'src': 'icon-512.png', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'any maskable'},

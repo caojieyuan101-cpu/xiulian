@@ -6,9 +6,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="修行">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#1b1719">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" href="icon-192.png">
@@ -16,27 +15,15 @@
 <style>
 /*FONTFACE*/
 :root{
-  /* layout: iOS-style large titles, grouped inset cards, bottom tab bar; poems set vertically on photos */
-  --bg:#f2f2f7; --card:#ffffff; --fill:rgba(120,120,128,.12); --fill2:rgba(120,120,128,.2);
-  --label:#000; --label2:rgba(60,60,67,.6); --label3:rgba(60,60,67,.3); --sep:rgba(60,60,67,.2);
-  --l:#5856d6; --r:#ff9500; --s:#ff2d55; --accent:#5856d6; --good:#34c759; --danger:#ff3b30;
+  /* layout: iOS-style large titles, grouped inset cards, bottom tab bar; poems set vertically on photos.
+     colour: one dark "dusk" theme taken from two sunset photos - warm silhouette black, sunset coral,
+     evening gold and dusk mauve. Deliberately single-theme: it looks the same in light and dark mode. */
+  --bg:#1b1719; --card:#262023; --fill:rgba(255,236,228,.08); --fill2:rgba(255,236,228,.15);
+  --label:#f4e9e6; --label2:#a3929a; --label3:#6f6369; --sep:#3a3135;
+  --l:#a986ad; --r:#e9ac3c; --s:#e65a3e; --accent:#f07a52; --gold:#ffd27a; --good:#e9ac3c; --danger:#ff6b55;
   --ui:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Hiragino Sans GB","Noto Sans SC",system-ui,sans-serif;
   --serif:"XiuSerif","Songti SC","STSong","Noto Serif SC",serif;
-  color-scheme:light;
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#000; --card:#1c1c1e; --fill:rgba(118,118,128,.24); --fill2:rgba(118,118,128,.32);
-    --label:#fff; --label2:rgba(235,235,245,.6); --label3:rgba(235,235,245,.3); --sep:rgba(84,84,88,.65);
-    --l:#5e5ce6; --r:#ff9f0a; --s:#ff375f; --accent:#7d7aff; --good:#30d158; --danger:#ff453a;
-    color-scheme:dark;
-  }
-}
-:root[data-theme="dark"]{
-    --bg:#000; --card:#1c1c1e; --fill:rgba(118,118,128,.24); --fill2:rgba(118,118,128,.32);
-    --label:#fff; --label2:rgba(235,235,245,.6); --label3:rgba(235,235,245,.3); --sep:rgba(84,84,88,.65);
-    --l:#5e5ce6; --r:#ff9f0a; --s:#ff375f; --accent:#7d7aff; --good:#30d158; --danger:#ff453a;
-    color-scheme:dark;
+  color-scheme:dark;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;margin:0}
@@ -47,7 +34,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 16px calc(env(safe-area-inset-bottom) + 96px)}
 .view{display:none}
 .view.on{display:block}
-.lt{font-size:34px;font-weight:700;letter-spacing:.01em;margin:10px 4px 0;line-height:1.2}
+.lt{font-family:var(--serif);font-size:34px;font-weight:700;letter-spacing:.06em;margin:10px 4px 0;line-height:1.2}
 .sub{color:var(--label2);font-size:15px;margin:2px 4px 18px}
 .gt{font-size:13px;color:var(--label2);margin:24px 16px 7px;letter-spacing:.02em}
 .gf{font-size:13px;color:var(--label2);margin:8px 16px 0;line-height:1.45}
@@ -82,7 +69,7 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 /* focus */
 .seg{display:flex;background:var(--fill);border-radius:9px;padding:2px;gap:2px}
 .seg button{flex:1;padding:6px 0;border-radius:7px;font-size:14px;font-weight:500}
-.seg button.on{background:var(--card);box-shadow:0 3px 8px rgba(0,0,0,.12),0 1px 1px rgba(0,0,0,.04)}
+.seg button.on{background:#40363a;box-shadow:0 3px 8px rgba(0,0,0,.25)}
 .face{display:grid;place-items:center;margin:26px 0 8px;position:relative}
 .face svg{width:min(72vw,280px);height:min(72vw,280px)}
 .face .t{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:4px}
@@ -140,8 +127,8 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 .tab.on{color:var(--accent)}
 
 /* poem on photo */
-.photo{position:absolute;inset:0;background-size:cover;background-position:center;background-color:#1d1b2e}
-.photo.empty{background-image:radial-gradient(120% 80% at 80% 10%,#3b3560 0%,transparent 60%),radial-gradient(90% 70% at 10% 90%,#5a2f3f 0%,transparent 60%),linear-gradient(160deg,#1c1a2b,#0e0d16)}
+.photo{position:absolute;inset:0;background-size:cover;background-position:center;background-color:#1b1719}
+.photo.empty{background-image:var(--sky);background-position:center bottom}
 .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.42) 0%,rgba(0,0,0,.05) 38%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.68) 100%)}
 .poem{display:flex;flex-direction:row-reverse;gap:.55em;color:#fff;font-family:var(--serif);text-shadow:0 1px 12px rgba(0,0,0,.45)}
 .poem .pc{writing-mode:vertical-rl;text-orientation:upright;letter-spacing:.22em;line-height:1}
@@ -213,6 +200,17 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 #toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 92px);transform:translate(-50%,20px);z-index:80;background:color-mix(in srgb,var(--label) 86%,transparent);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:15px;display:flex;gap:14px;align-items:center;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;white-space:nowrap}
 #toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
 #toast button{color:var(--accent);font-weight:600;filter:brightness(1.4)}
+/* dusk */
+.legend b,.trio b,.statbig .tot b{font-family:var(--serif)}
+.trio b,.statbig .tot b{color:var(--gold)}
+.skycard{position:relative;color:#fff}
+.skycard>svg{position:absolute;inset:0 0 -1px;width:100%;height:calc(100% + 1px)}
+.skycard .rings{position:relative;padding:16px 16px 34px}
+.skycard .legend b{color:#fff}
+.skycard .legend small{color:rgba(255,255,255,.75)}
+.seal{position:absolute;display:grid;place-items:center;font-family:var(--serif);font-weight:700;color:#fff;background:var(--s);border-radius:8px;width:46px;height:46px;font-size:25px;right:14px;top:12px;transform:rotate(-8deg);box-shadow:inset 0 0 0 2px rgba(255,236,210,.95),inset 0 0 0 3.5px var(--s);animation:stamp .35s cubic-bezier(.3,1.6,.5,1)}
+.qcard .seal{left:22px;top:24px;right:auto;width:56px;height:56px;font-size:30px;transform:rotate(-9deg);z-index:1}
+@keyframes stamp{from{transform:scale(1.8) rotate(-8deg);opacity:0}to{transform:rotate(-8deg);opacity:1}}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -450,6 +448,34 @@ function addEntry(k,m,src,day,extra){
   return {k,m,before,after,pi};
 }
 
+/* ---------- sunset sky ---------- */
+// slate-mauve clouds at the top burning down to coral and gold, a city wall and tree tops in silhouette,
+// optional bare branches from the top-left
+let skyN=0;
+function skySVG(w,h,wallH,opt){
+  opt=opt||{}; const id='sky'+(skyN++), m=opt.merlon||6, step=m*3.2, y=h-wallH;
+  let s='<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="'+(opt.par||'none')+'" aria-hidden="true"><defs>'
+   +'<linearGradient id="'+id+'g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5f566c"/><stop offset=".38" stop-color="#9b7a85"/><stop offset=".62" stop-color="#d9644a"/><stop offset=".8" stop-color="#ec8a4a"/><stop offset=".9" stop-color="#f1b24a"/></linearGradient>'
+   +'<filter id="'+id+'f"><feTurbulence type="fractalNoise" baseFrequency=".012 .05" numOctaves="3" seed="'+(opt.seed||3)+'"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 .55  0 0 0 0 .4  0 0 0 1.4 -.55"/></filter>'
+   +'</defs><rect width="'+w+'" height="'+h+'" fill="url(#'+id+'g)"/><rect width="'+w+'" height="'+(h*.8)+'" filter="url(#'+id+'f)" opacity=".55"/>';
+  let t='M'+(w*.62)+' '+(y+m); for(let x=w*.62;x<=w;x+=9) t+=' L'+(x+4.5).toFixed(1)+' '+(y-8-((x*7)%11)).toFixed(1)+' L'+(x+9).toFixed(1)+' '+(y+m);
+  s+='<path d="'+t+' Z" fill="#2a2023"/>';
+  let d='M0 '+h+' V'+(y+m); for(let x=4;x<w;x+=step) d+=' H'+x.toFixed(1)+' V'+y+' H'+(x+m*1.6).toFixed(1)+' V'+(y+m);
+  s+='<path d="'+d+' H'+w+' V'+h+' Z" fill="#1c1718"/>';
+  if(opt.branch){
+    let seed=5; const rnd=()=>((seed=seed*16807%2147483647)/2147483647); let g='';
+    (function grow(x,y,a,len,sw,depth){ const x2=x+Math.cos(a)*len, y2=y+Math.sin(a)*len;
+      g+='<path d="M'+x.toFixed(1)+' '+y.toFixed(1)+' L'+x2.toFixed(1)+' '+y2.toFixed(1)+'" stroke="#1c1718" stroke-width="'+sw.toFixed(2)+'" stroke-linecap="round"/>';
+      if(depth>0) for(let i=0;i<2+(rnd()<.4?1:0);i++) grow(x2,y2,a+(rnd()-.5)*1.1,len*(.62+rnd()*.18),sw*.62,depth-1); })(-10,h*.26,-0.55,w*.18,7,6);
+    s+='<g opacity=".92">'+g+'</g>';
+  }
+  return s+'</svg>';
+}
+// full-bleed background for the timer and the check-in card when there are no photos
+document.documentElement.style.setProperty('--sky','url("data:image/svg+xml,'+encodeURIComponent(skySVG(400,640,140,{par:'xMidYMax slice',merlon:9,branch:true,seed:7}))+'")');
+function todayMet(){ const o={l:0,r:0,s:0}; for(const e of S.entries) if(e.d===today()) o[e.k]+=e.m; return ORDER.every(k=>o[k]>=S.goals[k]); }
+const SEAL='<div class="seal" aria-label="今日达标">修</div>';
+
 /* ---------- views ---------- */
 let tab='today';
 function render(){
@@ -458,20 +484,21 @@ function render(){
   else if(tab==='skill') renderSkill();
   else renderLog();
 }
+const RING={l:'#e7d4f0',r:'#ffd27a',s:'#ff8a62'}, RLAB={l:'#efdcf5',r:'#ffe2a0',s:'#ffb59a'}; // lighter tones that read on the sky
 function ringSVG(){
   const t=today(), R=[60,45,30], c=72; let s='<svg viewBox="0 0 144 144" aria-hidden="true">';
   ORDER.forEach((k,i)=>{
     const r=R[i], circ=2*Math.PI*r, p=Math.min(1,minsOn(t,k)/Math.max(1,S.goals[k]));
-    s+='<circle cx="'+c+'" cy="'+c+'" r="'+r+'" fill="none" stroke="'+SK[k].c+'" stroke-opacity=".2" stroke-width="13"/>';
-    if(p>0) s+='<circle cx="'+c+'" cy="'+c+'" r="'+r+'" fill="none" stroke="'+SK[k].c+'" stroke-width="13" stroke-linecap="round" stroke-dasharray="'+(p*circ).toFixed(2)+' '+circ.toFixed(2)+'" transform="rotate(-90 '+c+' '+c+')"/>';
+    s+='<circle cx="'+c+'" cy="'+c+'" r="'+r+'" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="13"/>';
+    if(p>0) s+='<circle cx="'+c+'" cy="'+c+'" r="'+r+'" fill="none" stroke="'+RING[k]+'" stroke-width="13" stroke-linecap="round" stroke-dasharray="'+(p*circ).toFixed(2)+' '+circ.toFixed(2)+'" transform="rotate(-90 '+c+' '+c+')"/>';
   });
   return s+'</svg>';
 }
 function renderToday(){
   const t=today(), d=new Date(), tm=minsOn(t), all=minsAll();
   let h='<div class="lt">今天</div><div class="sub">'+(d.getMonth()+1)+'月'+d.getDate()+'日 星期'+WEEK[d.getDay()]+'</div>';
-  h+='<div class="card pad"><div class="rings">'+ringSVG()+'<div class="legend">';
-  ORDER.forEach(k=>{ h+='<div><span style="color:'+SK[k].c+'">'+SK[k].name+'</span><b>'+minsOn(t,k)+'<small> / '+S.goals[k]+' 分钟</small></b></div>'; });
+  h+='<div class="card skycard">'+skySVG(364,200,20,{merlon:5,seed:11})+(todayMet()? SEAL : '')+'<div class="rings">'+ringSVG()+'<div class="legend">';
+  ORDER.forEach(k=>{ h+='<div><span style="color:'+RLAB[k]+'">'+SK[k].name+'</span><b>'+minsOn(t,k)+'<small> / '+S.goals[k]+' 分钟</small></b></div>'; });
   h+='</div></div></div>';
   h+='<div class="gt">记录时间</div><div class="card">';
   ORDER.forEach(k=>{ h+='<button class="row ind tap" data-add="'+k+'"><span class="ico" style="background:'+SK[k].c+'">'+SK[k].name[0]+'</span><span class="grow">'+SK[k].name+'</span><span class="val">'+fmtMin(minsOn(t,k))+'</span><span class="plus" aria-hidden="true">+</span></button>'; });
@@ -762,8 +789,8 @@ let cardAfterFocus=false;
 function showCard(res, afterFocus){
   cardAfterFocus=!!afterFocus;
   const d=new Date();
-  let h='<div class="qcard"><div class="photo" id="cardPhoto"></div><div class="shade"></div>'+poemHTML(res.pi);
-  h+='<div class="info"><span class="stamp">'+d.getFullYear()+'.'+(d.getMonth()+1)+'.'+d.getDate()+' · '+(res.round? '今天第 '+res.round+' 个番茄' : '打卡')+'</span><b>'+SK[res.k].name+' +'+res.m+' 分钟</b><span>'+SK[res.k].name+'修为 '+res.before.toFixed(2)+' → '+res.after.toFixed(2)+'</span></div></div>';
+  let h='<div class="qcard"><div class="photo" id="cardPhoto"></div><div class="shade"></div>'+(todayMet()? SEAL : '')+poemHTML(res.pi);
+  h+='<div class="info"><span class="stamp">'+d.getFullYear()+'.'+(d.getMonth()+1)+'.'+d.getDate()+' · '+(todayMet()? '今日达标' : res.round? '今天第 '+res.round+' 个番茄' : '打卡')+'</span><b>'+SK[res.k].name+' +'+res.m+' 分钟</b><span>'+SK[res.k].name+'修为 '+res.before.toFixed(2)+' → '+res.after.toFixed(2)+'</span></div></div>';
   h+='<div class="card-actions">'+(afterFocus?'<button class="alt" data-card="rest">'+(nextRest>S.pomo.rest?'长休息 ':'休息 ')+nextRest+' 分钟</button>':'')+'<button data-card="done">完成</button></div>';
   $('cardModal').innerHTML=h; setPhoto($('cardPhoto'), randPhotoId());
   $('cardModal').classList.add('on');
@@ -771,7 +798,7 @@ function showCard(res, afterFocus){
 function reopenCard(){
   if(!S.last) return;
   const d=new Date();
-  let h='<div class="qcard"><div class="photo" id="cardPhoto"></div><div class="shade"></div>'+poemHTML(S.last.pi)+'<div class="info"><span class="stamp">'+d.getFullYear()+'.'+(d.getMonth()+1)+'.'+d.getDate()+' · 今日诗签</span><b>今日 '+minsOn(today())+' 分钟</b></div></div><div class="card-actions"><button data-card="done">完成</button></div>';
+  let h='<div class="qcard"><div class="photo" id="cardPhoto"></div><div class="shade"></div>'+(todayMet()? SEAL : '')+poemHTML(S.last.pi)+'<div class="info"><span class="stamp">'+d.getFullYear()+'.'+(d.getMonth()+1)+'.'+d.getDate()+' · 今日诗签</span><b>今日 '+minsOn(today())+' 分钟</b></div></div><div class="card-actions"><button data-card="done">完成</button></div>';
   $('cardModal').innerHTML=h; setPhoto($('cardPhoto'), randPhotoId()); cardAfterFocus=false;
   $('cardModal').classList.add('on');
 }
