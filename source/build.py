@@ -75,36 +75,44 @@ if not os.path.exists(os.path.join(ART, 'data.json')):
     open(os.path.join(ART, 'data.json'), 'w', encoding='utf-8').write('{"v":1}')
 print('artifact/index.html', round(os.path.getsize(os.path.join(ART, 'index.html')) / 1024), 'KB')
 
-# icons: the radar triangle over a sunset sky, a city wall in silhouette
+# icons: "three rings at sunset" - half a coral sun on the horizon inside two halos (gold, mauve),
+# which are also the listening / reading / speaking rings; a faint reflection below.
+# Drawn at 2x the 1024 design grid and scaled down for smooth edges.
 def icon(size):
-    S = 1024
+    from PIL import ImageFilter
+    K = 2
+    S = 1024 * K
+    hz = 640 * K                      # horizon
     img = Image.new('RGB', (S, S))
-    px = img.load()
-    stops = [(0, (95, 86, 108)), (.38, (155, 122, 133)), (.62, (217, 100, 74)), (.8, (236, 138, 74)), (1, (241, 178, 74))]
-    for y in range(S):
+    d = ImageDraw.Draw(img)
+    def lerp(a, b, t):
+        return tuple(int(a[i] + (b[i] - a[i]) * t) for i in range(3))
+    for y in range(S):                # sky above the horizon, water below
         t = y / S
-        for (a, ca), (b, cb) in zip(stops, stops[1:]):
-            if a <= t <= b:
-                u = (t - a) / (b - a)
-                c = tuple(int(ca[i] * (1 - u) + cb[i] * u) for i in range(3))
-                break
-        for x in range(S):
-            px[x, y] = c
-    d = ImageDraw.Draw(img, 'RGBA')
-    wall = 800
-    d.rectangle([0, wall + 34, S, S], fill=(28, 23, 24, 255))
-    for x in range(20, S, 104):
-        d.rectangle([x, wall, x + 52, wall + 40], fill=(28, 23, 24, 255))
-    cx, cy, R = 512, 470, 290
-    pts = lambda r: [(cx + r * math.cos(math.radians(a)), cy + r * math.sin(math.radians(a))) for a in (-90, 30, 150)]
-    for r in (R * 0.4, R * 0.7):
-        d.polygon(pts(r), outline=(255, 255, 255, 80), width=6)
-    d.polygon(pts(R), outline=(255, 255, 255, 240), width=14)
-    vals = [0.78, 0.62, 0.5]
-    inner = [(cx + R * v * math.cos(math.radians(a)), cy + R * v * math.sin(math.radians(a))) for v, a in zip(vals, (-90, 30, 150))]
-    d.polygon(inner, fill=(255, 226, 160, 110), outline=(255, 255, 255, 255), width=8)
-    for (x, y), col in zip(inner, [(231, 212, 240), (255, 210, 122), (255, 138, 98)]):
-        d.ellipse([x - 24, y - 24, x + 24, y + 24], fill=col + (255,), outline=(255, 255, 255, 255), width=7)
+        c = lerp((35, 28, 32), (46, 34, 38), t / .62) if t < .625 else lerp((24, 19, 26), (18, 14, 16), (t - .625) / .375)
+        d.line([(0, y), (S, y)], fill=c)
+    glow = Image.new('RGBA', (S, S), (0, 0, 0, 0))
+    ImageDraw.Draw(glow).ellipse([512 * K - 380 * K, hz - 260 * K, 512 * K + 380 * K, hz + 260 * K], fill=(255, 138, 98, 120))
+    glow = glow.filter(ImageFilter.GaussianBlur(150 * K))
+    img = Image.alpha_composite(img.convert('RGBA'), glow)
+    layer = Image.new('RGBA', (S, S), (0, 0, 0, 0))
+    d = ImageDraw.Draw(layer)
+    cx, w = 512 * K, 64 * K
+    def halo(r, col):                 # top half ring with round ends
+        r *= K
+        d.arc([cx - r - w / 2, hz - r - w / 2, cx + r + w / 2, hz + r + w / 2], 180, 360, fill=col, width=w)
+        for x in (cx - r, cx + r):
+            d.ellipse([x - w / 2, hz - w / 2, x + w / 2, hz + w / 2], fill=col)
+    halo(330, (169, 134, 173, 255))   # mauve
+    halo(232, (233, 172, 60, 255))    # gold
+    r = 150 * K
+    d.pieslice([cx - r, hz - r, cx + r, hz + r], 180, 360, fill=(230, 90, 62, 255))         # the sun
+    ry = r * .55                      # its reflection, flattened by the water
+    d.pieslice([cx - r, hz + 14 * K - ry, cx + r, hz + 14 * K + ry], 0, 180, fill=(230, 90, 62, 30))
+    d.rounded_rectangle([150 * K, hz - 4 * K, 874 * K, hz + 6 * K], radius=5 * K, fill=(244, 233, 230, 230))
+    d.rounded_rectangle([300 * K, 720 * K, 724 * K, 728 * K], radius=4 * K, fill=(244, 233, 230, 64))
+    d.rounded_rectangle([390 * K, 790 * K, 634 * K, 798 * K], radius=4 * K, fill=(244, 233, 230, 36))
+    img = Image.alpha_composite(img, layer).convert('RGB')
     return img.resize((size, size), Image.LANCZOS)
 
 big = icon(1024)
@@ -129,7 +137,9 @@ for name in ('bg-dusk.jpg', 'bg-street.jpg'):
     bg += data
     for d in (DIST, ART):
         open(os.path.join(d, name), 'wb').write(data)
-ver = hashlib.sha1(html.encode() + bg).hexdigest()[:10]
+# icons count too, so a new icon alone still refreshes the offline copy
+icons = b''.join(open(os.path.join(DIST, 'icon-%d.png' % n), 'rb').read() for n in (180, 192, 512))
+ver = hashlib.sha1(html.encode() + bg + icons).hexdigest()[:10]
 sw = open(os.path.join(SRC, 'sw.js'), encoding='utf-8').read().replace('__VERSION__', ver)
 open(os.path.join(DIST, 'sw.js'), 'w', encoding='utf-8').write(sw)
 open(os.path.join(DIST, '.nojekyll'), 'w').write('')
