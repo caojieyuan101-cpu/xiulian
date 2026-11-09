@@ -1,4 +1,4 @@
-const CACHE = 'xiulian-907a397392';
+const CACHE = 'xiulian-7c09062f2b';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
