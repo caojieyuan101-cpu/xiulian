@@ -17,6 +17,8 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
+  // sleep/ is a separate app with its own service worker
+  if (new URL(req.url).pathname.startsWith(new URL('./sleep/', self.registration.scope).pathname)) return;
   const key = req.mode === 'navigate' ? './index.html' : req;
   e.respondWith(
     caches.open(CACHE).then(async c => {
