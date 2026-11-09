@@ -6,9 +6,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="修行">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#1b1719">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" href="icon-192.png">
@@ -16,27 +15,15 @@
 <style>
 /*FONTFACE*/
 :root{
-  /* layout: iOS-style large titles, grouped inset cards, bottom tab bar; poems set vertically on photos */
-  --bg:#f2f2f7; --card:#ffffff; --fill:rgba(120,120,128,.12); --fill2:rgba(120,120,128,.2);
-  --label:#000; --label2:rgba(60,60,67,.6); --label3:rgba(60,60,67,.3); --sep:rgba(60,60,67,.2);
-  --l:#5856d6; --r:#ff9500; --s:#ff2d55; --accent:#5856d6; --good:#34c759; --danger:#ff3b30;
+  /* layout: iOS-style large titles, grouped inset cards, bottom tab bar; poems set vertically on photos.
+     colour: one dark "dusk" theme taken from two sunset photos - warm silhouette black, sunset coral,
+     evening gold and dusk mauve. Deliberately single-theme: it looks the same in light and dark mode. */
+  --bg:#1b1719; --card:#262023; --fill:rgba(255,236,228,.08); --fill2:rgba(255,236,228,.15);
+  --label:#f4e9e6; --label2:#a3929a; --label3:#6f6369; --sep:#3a3135;
+  --l:#a986ad; --r:#e9ac3c; --s:#e65a3e; --accent:#f07a52; --gold:#ffd27a; --good:#e9ac3c; --danger:#ff6b55;
   --ui:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Hiragino Sans GB","Noto Sans SC",system-ui,sans-serif;
   --serif:"XiuSerif","Songti SC","STSong","Noto Serif SC",serif;
-  color-scheme:light;
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#000; --card:#1c1c1e; --fill:rgba(118,118,128,.24); --fill2:rgba(118,118,128,.32);
-    --label:#fff; --label2:rgba(235,235,245,.6); --label3:rgba(235,235,245,.3); --sep:rgba(84,84,88,.65);
-    --l:#5e5ce6; --r:#ff9f0a; --s:#ff375f; --accent:#7d7aff; --good:#30d158; --danger:#ff453a;
-    color-scheme:dark;
-  }
-}
-:root[data-theme="dark"]{
-    --bg:#000; --card:#1c1c1e; --fill:rgba(118,118,128,.24); --fill2:rgba(118,118,128,.32);
-    --label:#fff; --label2:rgba(235,235,245,.6); --label3:rgba(235,235,245,.3); --sep:rgba(84,84,88,.65);
-    --l:#5e5ce6; --r:#ff9f0a; --s:#ff375f; --accent:#7d7aff; --good:#30d158; --danger:#ff453a;
-    color-scheme:dark;
+  color-scheme:dark;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;margin:0}
@@ -47,7 +34,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 16px calc(env(safe-area-inset-bottom) + 96px)}
 .view{display:none}
 .view.on{display:block}
-.lt{font-size:34px;font-weight:700;letter-spacing:.01em;margin:10px 4px 0;line-height:1.2}
+.lt{font-family:var(--serif);font-size:34px;font-weight:700;letter-spacing:.06em;margin:10px 4px 0;line-height:1.2}
 .sub{color:var(--label2);font-size:15px;margin:2px 4px 18px}
 .gt{font-size:13px;color:var(--label2);margin:24px 16px 7px;letter-spacing:.02em}
 .gf{font-size:13px;color:var(--label2);margin:8px 16px 0;line-height:1.45}
@@ -82,7 +69,7 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 /* focus */
 .seg{display:flex;background:var(--fill);border-radius:9px;padding:2px;gap:2px}
 .seg button{flex:1;padding:6px 0;border-radius:7px;font-size:14px;font-weight:500}
-.seg button.on{background:var(--card);box-shadow:0 3px 8px rgba(0,0,0,.12),0 1px 1px rgba(0,0,0,.04)}
+.seg button.on{background:#40363a;box-shadow:0 3px 8px rgba(0,0,0,.25)}
 .face{display:grid;place-items:center;margin:26px 0 8px;position:relative}
 .face svg{width:min(72vw,280px);height:min(72vw,280px)}
 .face .t{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:4px}
@@ -140,8 +127,7 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 .tab.on{color:var(--accent)}
 
 /* poem on photo */
-.photo{position:absolute;inset:0;background-size:cover;background-position:center;background-color:#1d1b2e}
-.photo.empty{background-image:radial-gradient(120% 80% at 80% 10%,#3b3560 0%,transparent 60%),radial-gradient(90% 70% at 10% 90%,#5a2f3f 0%,transparent 60%),linear-gradient(160deg,#1c1a2b,#0e0d16)}
+.photo{position:absolute;inset:0;background-size:cover;background-position:center;background-color:#1b1719}
 .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.42) 0%,rgba(0,0,0,.05) 38%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.68) 100%)}
 .poem{display:flex;flex-direction:row-reverse;gap:.55em;color:#fff;font-family:var(--serif);text-shadow:0 1px 12px rgba(0,0,0,.45)}
 .poem .pc{writing-mode:vertical-rl;text-orientation:upright;letter-spacing:.22em;line-height:1}
@@ -195,9 +181,6 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 .chip{background:var(--card);border-radius:18px;padding:8px 16px;font-size:15px;font-variant-numeric:tabular-nums}
 .chip:active{background:var(--fill2)}
 .chip.on{background:var(--accent);color:#fff}
-.photos{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;border-radius:14px;overflow:hidden}
-.photos div{position:relative;aspect-ratio:3/4;background-size:cover;background-position:center;background-color:var(--fill)}
-.photos button{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:15px;line-height:26px}
 .plist{display:flex;flex-direction:column;gap:10px}
 .plist div{background:var(--card);border-radius:14px;padding:14px 16px;font-family:var(--serif);font-size:17px;line-height:1.7;-webkit-user-select:text;user-select:text}
 .plist small{display:block;font-family:var(--ui);font-size:13px;color:var(--label2);margin-top:4px}
@@ -213,6 +196,33 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 #toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 92px);transform:translate(-50%,20px);z-index:80;background:color-mix(in srgb,var(--label) 86%,transparent);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:15px;display:flex;gap:14px;align-items:center;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;white-space:nowrap}
 #toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
 #toast button{color:var(--accent);font-weight:600;filter:brightness(1.4)}
+/* dusk */
+.legend b,.trio b,.statbig .tot b{font-family:var(--serif)}
+.trio b,.statbig .tot b{color:var(--gold)}
+.skycard{position:relative;color:#fff}
+.skycard{background-color:#1b1719;background-repeat:no-repeat}
+.skycard{background-image:linear-gradient(165deg,#3a3135 0%,#1b1719 75%)}
+.photo.empty{background-image:linear-gradient(165deg,#3a3135 0%,#1b1719 75%)}
+.wphint{position:absolute;right:10px;bottom:10px;z-index:1;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(27,23,25,.45);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#fff;pointer-events:none}
+.wphint svg{width:18px;height:18px}
+.skycard.tapwp{cursor:pointer}
+.skycard.tapwp:active{filter:brightness(.92)}
+.bgpick{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.wpt{position:relative}
+.bgt{position:relative;width:100%;aspect-ratio:3/4;border-radius:12px;overflow:hidden;background:var(--fill) center/cover no-repeat;display:flex;align-items:flex-end;box-shadow:inset 0 0 0 1px var(--sep)}
+.bgt span{width:100%;padding:16px 6px 6px;font-size:12px;color:#fff;text-align:left;background:linear-gradient(transparent,rgba(0,0,0,.6))}
+.bgt.on{box-shadow:inset 0 0 0 3px var(--accent)}
+.bgt.add{align-items:center;justify-content:center;color:var(--accent);font-size:15px;font-weight:600;flex-direction:column;gap:4px;box-shadow:inset 0 0 0 1.5px var(--sep)}
+.bgt.add b{font-size:30px;font-weight:300;line-height:1}
+.wpdel{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:15px;line-height:26px;text-align:center}
+.chk{color:var(--accent);font-weight:600;width:20px;text-align:right}
+.skycard::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(27,23,25,.42),rgba(27,23,25,.08) 62%),linear-gradient(0deg,rgba(27,23,25,.35),transparent 45%)}
+.skycard .rings{position:relative;padding:16px 16px 34px}
+.skycard .legend b{color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.35)}
+.skycard .legend small{color:rgba(255,255,255,.75)}
+.seal{position:absolute;display:grid;place-items:center;font-family:var(--serif);font-weight:700;color:#fff;background:var(--s);border-radius:8px;width:46px;height:46px;font-size:25px;right:14px;top:12px;transform:rotate(-8deg);box-shadow:inset 0 0 0 2px rgba(255,236,210,.95),inset 0 0 0 3.5px var(--s);animation:stamp .35s cubic-bezier(.3,1.6,.5,1)}
+.qcard .seal{left:22px;top:24px;right:auto;width:56px;height:56px;font-size:30px;transform:rotate(-9deg);z-index:1}
+@keyframes stamp{from{transform:scale(1.8) rotate(-8deg);opacity:0}to{transform:rotate(-8deg);opacity:1}}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -334,7 +344,7 @@ async function bootCloud(){
   const p=lsGet(LP);
   S = remote||defState();
   if(p&&p.state&&dataOk) S=mergePending(S,p);
-  await loadPhotos(); render(); if(TM) openStage();
+  await loadPhotos(); if(WP.mode==='open' && !TM) stepWp(); render(); if(TM) openStage();
   art = await use('artifact');
   if(art && dataOk){ sync='cloud'; if(lsGet(LP)){ setSync('saving'); publishNow(); } }
   else { const l=loadLocal(); if(l) S=l; sync='local'; await loadPhotos(); }
@@ -436,8 +446,6 @@ async function delPhoto(id){
   await loadPhotos();
 }
 function photoUrl(id){ const p=photos.find(x=>x.id===id); return p?p.url:null; }
-function randPhotoId(){ return photos.length? photos[Math.floor(Math.random()*photos.length)].id : null; }
-function setPhoto(el,id){ const u=id&&photoUrl(id); el.style.backgroundImage=u?'url("'+u+'")':''; el.classList.toggle('empty',!u); }
 
 /* ---------- entries ---------- */
 function addEntry(k,m,src,day,extra){
@@ -450,6 +458,33 @@ function addEntry(k,m,src,day,extra){
   return {k,m,before,after,pi};
 }
 
+/* ---------- dusk ---------- */
+/* ---------- wallpaper, like a phone's ----------
+   One gallery: two sunset photos to start with (removable) plus the photos you add.
+   How it changes is up to you: never, on a tap, each time the app opens, every hour, or every day.
+   Kept per device, the way each phone has its own wallpaper. */
+const BUILTIN=[
+  {id:'b:dusk',url:'bg-dusk.jpg',pos:'85% 60%',size:'170% auto',full:'center 55%'},
+  {id:'b:street',url:'bg-street.jpg',pos:'50% 32%',size:'135% auto',full:'center 40%'}];
+const WP_MODES=[['fixed','不切换','一直用选中的那张'],['tap','轻点切换','点一下今日卡片，换下一张'],['open','每次打开','每次打开 app 换一张'],['hour','每小时','每过一小时换一张'],['day','每天','每天换一张']];
+let WP=Object.assign({mode:'fixed',cur:'b:dusk',at:0,hide:[]}, lsGet('xiulian.wp')||{});
+function saveWp(){ lsSet('xiulian.wp',WP); }
+function wpList(){ return BUILTIN.filter(b=>WP.hide.indexOf(b.id)<0).concat(photos.map(p=>({id:p.id,url:p.url,pos:'center',size:'cover',full:'center'}))); }
+function wpPeriod(){ return WP.mode==='hour'? Math.floor(Date.now()/3600e3) : WP.mode==='day'? Math.floor(pkey(today())/864e5) : 0; }
+function curWp(){
+  const L=wpList(), n=L.length; if(!n) return null;
+  const i=Math.max(0,L.findIndex(w=>w.id===WP.cur));
+  return L[(i+Math.max(0,wpPeriod()-(WP.at||0)))%n];   // hour/day move on from the chosen one
+}
+function setWp(id){ WP.cur=id; WP.at=wpPeriod(); saveWp(); }
+function stepWp(){ const L=wpList(), w=curWp(); if(L.length<2) return; setWp(L[(L.findIndex(x=>x.id===w.id)+1)%L.length].id); }
+function paintWp(el){ const w=curWp(); el.style.backgroundImage= w? 'url("'+w.url+'")' : ''; el.style.backgroundPosition= w? w.full : ''; el.classList.toggle('empty',!w); }
+function wpStyle(){ const w=curWp(); return w? 'background-image:url(&quot;'+w.url+'&quot;);background-position:'+w.pos+';background-size:'+w.size : ''; }
+const SWAP_ICON='<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="15" height="12" rx="2.5"/><path d="M2.5 13l4-4 3.5 3.5 2.5-2.5 5 5"/><circle cx="13.5" cy="7.5" r="1.3"/></svg>';
+let hiddenAt=0;
+function todayMet(){ const o={l:0,r:0,s:0}; for(const e of S.entries) if(e.d===today()) o[e.k]+=e.m; return ORDER.every(k=>o[k]>=S.goals[k]); }
+const SEAL='<div class="seal" aria-label="今日达标">修</div>';
+
 /* ---------- views ---------- */
 let tab='today';
 function render(){
@@ -458,20 +493,22 @@ function render(){
   else if(tab==='skill') renderSkill();
   else renderLog();
 }
+const RING={l:'#e7d4f0',r:'#ffd27a',s:'#ff8a62'}, RLAB={l:'#efdcf5',r:'#ffe2a0',s:'#ffb59a'}; // lighter tones that read on the sky
 function ringSVG(){
   const t=today(), R=[60,45,30], c=72; let s='<svg viewBox="0 0 144 144" aria-hidden="true">';
   ORDER.forEach((k,i)=>{
     const r=R[i], circ=2*Math.PI*r, p=Math.min(1,minsOn(t,k)/Math.max(1,S.goals[k]));
-    s+='<circle cx="'+c+'" cy="'+c+'" r="'+r+'" fill="none" stroke="'+SK[k].c+'" stroke-opacity=".2" stroke-width="13"/>';
-    if(p>0) s+='<circle cx="'+c+'" cy="'+c+'" r="'+r+'" fill="none" stroke="'+SK[k].c+'" stroke-width="13" stroke-linecap="round" stroke-dasharray="'+(p*circ).toFixed(2)+' '+circ.toFixed(2)+'" transform="rotate(-90 '+c+' '+c+')"/>';
+    s+='<circle cx="'+c+'" cy="'+c+'" r="'+r+'" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="13"/>';
+    if(p>0) s+='<circle cx="'+c+'" cy="'+c+'" r="'+r+'" fill="none" stroke="'+RING[k]+'" stroke-width="13" stroke-linecap="round" stroke-dasharray="'+(p*circ).toFixed(2)+' '+circ.toFixed(2)+'" transform="rotate(-90 '+c+' '+c+')"/>';
   });
   return s+'</svg>';
 }
 function renderToday(){
   const t=today(), d=new Date(), tm=minsOn(t), all=minsAll();
   let h='<div class="lt">今天</div><div class="sub">'+(d.getMonth()+1)+'月'+d.getDate()+'日 星期'+WEEK[d.getDay()]+'</div>';
-  h+='<div class="card pad"><div class="rings">'+ringSVG()+'<div class="legend">';
-  ORDER.forEach(k=>{ h+='<div><span style="color:'+SK[k].c+'">'+SK[k].name+'</span><b>'+minsOn(t,k)+'<small> / '+S.goals[k]+' 分钟</small></b></div>'; });
+  const tapWp=WP.mode==='tap' && wpList().length>1;
+  h+='<div class="card skycard'+(tapWp?' tapwp':'')+'" style="'+wpStyle()+'"'+(tapWp?' role="button" aria-label="换一张壁纸"':'')+'>'+(todayMet()? SEAL : '')+(tapWp?'<span class="wphint" aria-hidden="true">'+SWAP_ICON+'</span>':'')+'<div class="rings">'+ringSVG()+'<div class="legend">';
+  ORDER.forEach(k=>{ h+='<div><span style="color:'+RLAB[k]+'">'+SK[k].name+'</span><b>'+minsOn(t,k)+'<small> / '+S.goals[k]+' 分钟</small></b></div>'; });
   h+='</div></div></div>';
   h+='<div class="gt">记录时间</div><div class="card">';
   ORDER.forEach(k=>{ h+='<button class="row ind tap" data-add="'+k+'"><span class="ico" style="background:'+SK[k].c+'">'+SK[k].name[0]+'</span><span class="grow">'+SK[k].name+'</span><span class="val">'+fmtMin(minsOn(t,k))+'</span><span class="plus" aria-hidden="true">+</span></button>'; });
@@ -499,7 +536,7 @@ function renderFocus(){
     h+='<div class="row"><span class="grow">长休息<br><small style="color:var(--label2);font-size:13px">每完成 4 个番茄</small></span><span class="val">'+P.long+' 分钟</span><span class="stepper"><button data-step="long:-5" aria-label="减少长休息">−</button><button data-step="long:5" aria-label="增加长休息">+</button></span></div></div>';
   }
   h+='<div style="margin-top:22px"><button class="primary" id="startFocus">'+(free?'开始计时':'开始专注')+'</button></div>';
-  h+='<div class="gf">'+(free? '计时到 3 小时会自动暂停，问你还在不在学。' : '专注时可以随时暂停，快结束时可以再加 5 分钟。')+' '+(photos.length? '背景会随机显示你的 '+photos.length+' 张照片和一句诗词。' : '到「记录 › 背景照片」添加照片，专注时就用它们做背景。')+'</div>';
+  h+='<div class="gf">'+(free? '计时到 3 小时会自动暂停，问你还在不在学。' : '专注时可以随时暂停，快结束时可以再加 5 分钟。')+' '+(wpList().length? '背景是你的壁纸和一句诗词。' : '到「记录 › 壁纸」添加照片，专注时就用它做背景。')+'</div>';
   $('v-focus').innerHTML=h;
 }
 function radarSVG(){
@@ -695,7 +732,7 @@ function renderLog(){
   h+='<div class="gt">设置</div><div class="card">';
   h+='<button class="row tap" data-open="goals"><span class="grow">每日目标</span><span class="val">'+S.goals.l+' / '+S.goals.r+' / '+S.goals.s+' 分</span><span class="chev">›</span></button>';
   h+='<button class="row tap" data-open="base"><span class="grow">初始能力值</span><span class="val">'+S.base.l+' / '+S.base.r+' / '+S.base.s+'</span><span class="chev">›</span></button>';
-  h+='<button class="row tap" data-open="photos"><span class="grow">背景照片</span><span class="val">'+photos.length+' 张</span><span class="chev">›</span></button>';
+  h+='<button class="row tap" data-open="photos"><span class="grow">壁纸</span><span class="val">'+wpList().length+' 张 · '+WP_MODES.find(m=>m[0]===WP.mode)[1]+'</span><span class="chev">›</span></button>';
   h+='<button class="row tap" data-open="backup"><span class="grow">备份与恢复</span><span class="chev">›</span></button>';
   h+='</div><div class="gf">'+storageNote()+'</div>';
   $('v-log').innerHTML=h;
@@ -729,11 +766,13 @@ function drawSheet(){
     h=head('初始能力值','','完成');
     h+='<div class="card">'+ORDER.map(k=>stepRow(SK[k].name,'base.'+k,S.base[k],'')).join('')+'</div><div class="gf">这是开始记录之前的水平，满分 100。默认值是按留考日语 317 分估的：阅读 60、听力 50、口语 35。改了以后，修为会按新的起点重新计算。</div>';
   } else if(sheetKind==='photos'){
-    h=head('背景照片','','完成');
-    if(TARGET==='pwa' || assets || sync==='local') h+='<button class="secondary" data-pick="1" style="margin-bottom:14px">从相册添加</button>';
-    if(photos.length) h+='<div class="photos">'+photos.map(p=>'<div style="background-image:url(&quot;'+p.url+'&quot;)"><button data-delphoto="'+p.id+'" aria-label="删除这张照片">×</button></div>').join('')+'</div>';
-    else h+='<div class="gf" style="text-align:center">还没有照片</div>';
-    h+='<div class="gf">'+(assets? '照片会压缩后上传到这个页面，手机和电脑都能用。' : '照片会压缩后存在这台设备里。')+'专注和打卡卡片会随机用它们做背景。</div>';
+    h=head('壁纸','','完成');
+    const cw=curWp(), canAdd= TARGET==='pwa' || assets || sync==='local';
+    h+='<div class="gt" style="margin-top:4px">切换方式</div><div class="card">'+WP_MODES.map(([m,t,d])=>'<button class="row tap" data-wpmode="'+m+'" aria-pressed="'+(WP.mode===m)+'"><span class="grow">'+t+'<br><small style="color:var(--label2);font-size:13px">'+d+'</small></span><span class="chk">'+(WP.mode===m?'✓':'')+'</span></button>').join('')+'</div>';
+    h+='<div class="gt">我的壁纸 · 点一张设为当前</div><div class="bgpick">'
+      +wpList().map(w=>'<div class="wpt"><button class="bgt'+(cw&&w.id===cw.id?' on':'')+'" data-wpset="'+esc(w.id)+'" style="background-image:url(&quot;'+w.url+'&quot;)" aria-label="设为当前壁纸">'+(cw&&w.id===cw.id?'<span>当前</span>':'')+'</button><button class="wpdel" '+(w.id.startsWith('b:')?'data-wphide':'data-delphoto')+'="'+esc(w.id)+'" aria-label="删除这张">×</button></div>').join('')
+      +(canAdd?'<button class="bgt add" data-pick="1"><b>＋</b>添加</button>':'')+'</div>';
+    h+='<div class="gf">'+(wpList().length? '今日卡片、专注和打卡卡片都用当前这张。' : '还没有壁纸，点「添加」从相册选。')+(assets? '添加的照片会压缩后上传到这个页面，手机和电脑都能用；切换方式每台设备各自设置。' : '照片会压缩后存在这台设备里。')+'</div>';
   } else if(sheetKind==='backup'){
     h=head('备份与恢复','','完成');
     h+='<button class="secondary" data-export="1">导出备份</button><div class="gf" style="margin-bottom:16px">导出你的全部记录（不含照片），可以存到「文件」或发给自己。</div>';
@@ -762,17 +801,17 @@ let cardAfterFocus=false;
 function showCard(res, afterFocus){
   cardAfterFocus=!!afterFocus;
   const d=new Date();
-  let h='<div class="qcard"><div class="photo" id="cardPhoto"></div><div class="shade"></div>'+poemHTML(res.pi);
-  h+='<div class="info"><span class="stamp">'+d.getFullYear()+'.'+(d.getMonth()+1)+'.'+d.getDate()+' · '+(res.round? '今天第 '+res.round+' 个番茄' : '打卡')+'</span><b>'+SK[res.k].name+' +'+res.m+' 分钟</b><span>'+SK[res.k].name+'修为 '+res.before.toFixed(2)+' → '+res.after.toFixed(2)+'</span></div></div>';
+  let h='<div class="qcard"><div class="photo" id="cardPhoto"></div><div class="shade"></div>'+(todayMet()? SEAL : '')+poemHTML(res.pi);
+  h+='<div class="info"><span class="stamp">'+d.getFullYear()+'.'+(d.getMonth()+1)+'.'+d.getDate()+' · '+(todayMet()? '今日达标' : res.round? '今天第 '+res.round+' 个番茄' : '打卡')+'</span><b>'+SK[res.k].name+' +'+res.m+' 分钟</b><span>'+SK[res.k].name+'修为 '+res.before.toFixed(2)+' → '+res.after.toFixed(2)+'</span></div></div>';
   h+='<div class="card-actions">'+(afterFocus?'<button class="alt" data-card="rest">'+(nextRest>S.pomo.rest?'长休息 ':'休息 ')+nextRest+' 分钟</button>':'')+'<button data-card="done">完成</button></div>';
-  $('cardModal').innerHTML=h; setPhoto($('cardPhoto'), randPhotoId());
+  $('cardModal').innerHTML=h; paintWp($('cardPhoto'));
   $('cardModal').classList.add('on');
 }
 function reopenCard(){
   if(!S.last) return;
   const d=new Date();
-  let h='<div class="qcard"><div class="photo" id="cardPhoto"></div><div class="shade"></div>'+poemHTML(S.last.pi)+'<div class="info"><span class="stamp">'+d.getFullYear()+'.'+(d.getMonth()+1)+'.'+d.getDate()+' · 今日诗签</span><b>今日 '+minsOn(today())+' 分钟</b></div></div><div class="card-actions"><button data-card="done">完成</button></div>';
-  $('cardModal').innerHTML=h; setPhoto($('cardPhoto'), randPhotoId()); cardAfterFocus=false;
+  let h='<div class="qcard"><div class="photo" id="cardPhoto"></div><div class="shade"></div>'+(todayMet()? SEAL : '')+poemHTML(S.last.pi)+'<div class="info"><span class="stamp">'+d.getFullYear()+'.'+(d.getMonth()+1)+'.'+d.getDate()+' · 今日诗签</span><b>今日 '+minsOn(today())+' 分钟</b></div></div><div class="card-actions"><button data-card="done">完成</button></div>';
+  $('cardModal').innerHTML=h; paintWp($('cardPhoto')); cardAfterFocus=false;
   $('cardModal').classList.add('on');
 }
 
@@ -798,12 +837,12 @@ function startPhase(phase,min){
   const P=S.pomo, free= phase==='focus' && P.mode==='free';
   min=min||(phase==='focus'? P.focus : P.rest);
   const ms=free? 0 : min*60000, now=Date.now();
-  TM={phase,mode:free?'free':'pomo',k:P.k,total:ms,end:now+ms,start:now,left:null,photo:randPhotoId(),poem:anyPoem(),round:(phase==='focus'&&!free)? roundsToday()+1 : 0};
+  TM={phase,mode:free?'free':'pomo',k:P.k,total:ms,end:now+ms,start:now,left:null,poem:anyPoem(),round:(phase==='focus'&&!free)? roundsToday()+1 : 0};
   saveT(); openStage();
 }
 function openStage(){
   const T=TM; if(!T) return;
-  setPhoto($('stagePhoto'), T.photo && photoUrl(T.photo) ? T.photo : randPhotoId());
+  paintWp($('stagePhoto'));
   $('stagePoem').innerHTML=poemHTML(T.poem||0);
   $('stagePhase').textContent= T.phase==='rest'? (T.total>S.pomo.rest*60000? '长休息' : '休息一下') : isFree(T)? '正计时 · '+SK[T.k].name : '专注 · '+SK[T.k].name+(T.round? ' · 第 '+T.round+' 个番茄' : '');
   $('stageMore').hidden= T.phase!=='focus' || isFree(T);
@@ -894,6 +933,7 @@ async function importData(file){
 
 /* ---------- events ---------- */
 document.addEventListener('click',e=>{
+  if(WP.mode==='tap' && e.target.closest('.skycard.tapwp')){ stepWp(); renderToday(); return; }
   const b=e.target.closest('button'); if(!b) return;
   const ds=b.dataset;
   if(ds.tab){ tab=ds.tab; document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t===b)); document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+tab)); render(); window.scrollTo(0,0); return; }
@@ -929,6 +969,9 @@ document.addEventListener('click',e=>{
     else S.base[k]=Math.max(0,Math.min(90,S.base[k]+Number(n)));
     save(); drawSheet(); render(); return; }
   if(ds.pick){ $('photoInput').click(); return; }
+  if(ds.wpmode){ const shown=curWp(); WP.mode=ds.wpmode; if(shown) setWp(shown.id); else saveWp(); drawSheet(); render(); return; }
+  if(ds.wpset){ setWp(ds.wpset); drawSheet(); render(); return; }
+  if(ds.wphide!=null){ const id=ds.wphide; dialog('删除这张壁纸？','',[{t:'删除',cls:'d',fn:()=>{ const shown=curWp(); WP.hide.push(id); if(shown&&shown.id===id){ const L=wpList(); WP.cur=L.length? L[0].id : null; } saveWp(); drawSheet(); render(); }},{t:'取消',cls:'b'}]); return; }
   if(ds.delphoto){ const id=ds.delphoto; dialog('删除这张照片？','',[{t:'删除',cls:'d',fn:async()=>{ await delPhoto(id); drawSheet(); render(); }},{t:'取消',cls:'b'}]); return; }
   if(ds.export){ exportData(); return; }
   if(ds.import){ $('importInput').click(); return; }
@@ -937,13 +980,13 @@ document.addEventListener('click',e=>{
 $('scrim').addEventListener('click',closeSheet);
 $('photoInput').addEventListener('change',async e=>{ const fs=[...e.target.files]; e.target.value=''; if(!fs.length) return; toast('正在添加…'); await addPhotos(fs); if(sheetKind==='photos') drawSheet(); render(); });
 $('importInput').addEventListener('change',e=>{ const f=e.target.files[0]; e.target.value=''; if(f) importData(f); });
-document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden' && pubT) publishNow(); if(document.visibilityState==='visible'){ if(TM){ if(!$('stage').classList.contains('on')) openStage(); else { tick(); lockOn(); } } render(); } });
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden'){ hiddenAt=Date.now(); if(pubT) publishNow(); } if(document.visibilityState==='visible'){ if(WP.mode==='open' && hiddenAt && Date.now()-hiddenAt>60000 && !TM) stepWp(); if(TM){ if(!$('stage').classList.contains('on')) openStage(); else { tick(); lockOn(); } } render(); } });
 
 /* ---------- start ---------- */
 render();
 if(TARGET==='artifact') bootCloud();
 else {
-  loadPhotos().then(()=>{ render(); if(TM) openStage(); });
+  loadPhotos().then(()=>{ if(WP.mode==='open' && !TM) stepWp(); render(); if(TM) openStage(); });
   if('serviceWorker' in navigator && location.protocol==='https:'){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
 }
 })();
