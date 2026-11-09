@@ -25,12 +25,18 @@
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){
-  :root{
+  :root:not([data-theme="light"]){
     --bg:#000; --card:#1c1c1e; --fill:rgba(118,118,128,.24); --fill2:rgba(118,118,128,.32);
     --label:#fff; --label2:rgba(235,235,245,.6); --label3:rgba(235,235,245,.3); --sep:rgba(84,84,88,.65);
     --l:#5e5ce6; --r:#ff9f0a; --s:#ff375f; --accent:#7d7aff; --good:#30d158; --danger:#ff453a;
     color-scheme:dark;
   }
+}
+:root[data-theme="dark"]{
+    --bg:#000; --card:#1c1c1e; --fill:rgba(118,118,128,.24); --fill2:rgba(118,118,128,.32);
+    --label:#fff; --label2:rgba(235,235,245,.6); --label3:rgba(235,235,245,.3); --sep:rgba(84,84,88,.65);
+    --l:#5e5ce6; --r:#ff9f0a; --s:#ff375f; --accent:#7d7aff; --good:#30d158; --danger:#ff453a;
+    color-scheme:dark;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;margin:0}
@@ -241,15 +247,79 @@ const REALMS = [
   [90,'登峰造极','和母语者几乎没有差别'],
   [97,'返璞归真','已臻化境']
 ];
-const LS = 'xiulian.v1';
+const TARGET = /*TARGET*/'pwa'; // 'artifact' when built for the Claude page
+const LS = 'xiulian.v1', LT = 'xiulian.timer', LP = 'xiulian.pending';
 const WEEK = ['日','一','二','三','四','五','六'];
 
-function defState(){ return {v:1,goals:{l:60,r:30,s:20},base:{l:50,r:60,s:35},entries:[],seen:[],collected:{},last:null,pomo:{focus:25,rest:5,k:'l'},timer:null}; }
+function defState(){ return {v:1,goals:{l:60,r:30,s:20},base:{l:50,r:60,s:35},entries:[],seen:[],collected:{},last:null,pomo:{focus:25,rest:5,k:'l'},photos:[]}; }
 // fill in anything missing (older saves, older backups) with defaults
-function normalize(s){ const d=defState(); return Object.assign(d,s,{goals:Object.assign(d.goals,s.goals),base:Object.assign(d.base,s.base),pomo:Object.assign(d.pomo,s.pomo)}); }
-function load(){ try{ const s=JSON.parse(localStorage.getItem(LS)); if(s&&s.v===1) return normalize(s); }catch(e){} return defState(); }
-let S = load();
-function save(){ try{ localStorage.setItem(LS, JSON.stringify(S)); }catch(e){ toast('保存失败：手机存储空间不足'); } }
+function normalize(s){ const d=defState(); const o=Object.assign(d,s,{goals:Object.assign(d.goals,s.goals),base:Object.assign(d.base,s.base),pomo:Object.assign(d.pomo,s.pomo)}); if(!Array.isArray(o.photos)) o.photos=[]; delete o.timer; return o; }
+function lsGet(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } }
+function lsSet(k,v){ try{ if(v==null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v)); return true; }catch(e){ return false; } }
+function loadLocal(){ const s=lsGet(LS); if(s&&s.v===1){ if(s.timer&&!TM){ TM=s.timer; saveT(); } return normalize(s); } return null; }
+// a running pomodoro belongs to this device only
+let TM = lsGet(LT);
+function saveT(){ lsSet(LT, TM); }
+
+/* sync: the PWA keeps everything in this browser. The Claude page keeps the
+   records in its own data.json and saves by publishing that file. */
+let S = TARGET==='pwa' ? (loadLocal()||defState()) : defState();
+let sync = TARGET==='pwa' ? 'local' : 'loading'; // loading | cloud | saving | local | readonly
+let art=null, assets=null, dls=null, dataOk=false, loadedAt=Date.now(), pubT=null, pubBusy=false, pubAgain=false, pubRetried=false;
+function save(){
+  if(sync==='local'){ if(!lsSet(LS,S)) toast('保存失败：存储空间不足'); return; }
+  if(sync==='readonly') return;
+  lsSet(LP,{state:S,base:loadedAt}); // survives a reload until the publish lands
+  clearTimeout(pubT); pubT=setTimeout(publishNow,2000);
+  if(sync==='cloud') setSync('saving');
+}
+function setSync(v){ sync=v; if(tab==='log') renderLog(); }
+async function publishNow(){
+  clearTimeout(pubT); pubT=null;
+  if(!art || !dataOk || (sync!=='cloud' && sync!=='saving')) return;
+  if(pubBusy){ pubAgain=true; return; }
+  pubBusy=true; const snap=JSON.stringify(S);
+  try{
+    await art.publish({'data.json':{content:snap,contentType:'application/json'}});
+    pubRetried=false;
+    if(JSON.stringify(S)===snap){ lsSet(LP,null); setSync('cloud'); }
+  }catch(e){
+    const c=e&&e.code;
+    if(c==='conflict') toast('另一台设备刚保存过，页面马上刷新');
+    else if(['not_writer','not_granted','consent_required','not_declared'].indexOf(c)>=0){ lsSet(LP,null); setSync('readonly'); toast('你只有查看权限，改动不会保存'); }
+    else if(['capability_disabled','capability_removed'].indexOf(c)>=0){ lsSet(LP,null); lsSet(LS,S); setSync('local'); toast('这里不能同步，记录先存在这台设备上'); }
+    else if(c==='rate_limited'){ pubT=setTimeout(publishNow,15000); }
+    else if(!pubRetried){ pubRetried=true; pubT=setTimeout(publishNow,2000+Math.random()*3000); }
+    else { pubRetried=false; toast('同步失败，下次记录时会再试'); }
+  }
+  pubBusy=false;
+  if(pubAgain){ pubAgain=false; publishNow(); }
+}
+// edits saved here but not yet published when the page reloaded: keep them,
+// and keep entries another device added after this one loaded
+function mergePending(remote,p){
+  const st=normalize(p.state), base=p.base||0;
+  const ids=new Set(st.entries.map(e=>e.id)); remote.entries.forEach(e=>{ if(!ids.has(e.id) && e.t>base) st.entries.push(e); });
+  const pids=new Set(st.photos.map(x=>x.id)); remote.photos.forEach(x=>{ if(!pids.has(x.id) && x.added>base) st.photos.push(x); });
+  st.collected=Object.assign({},remote.collected,st.collected);
+  return st;
+}
+async function bootCloud(){
+  const use=n=> (window.claude && typeof window.claude.use==='function') ? window.claude.use(n).catch(()=>null) : Promise.resolve(null);
+  use('assets').then(a=>{ assets=a; if(sheetKind==='photos') drawSheet(); });
+  use('downloads').then(d=>{ dls=d; });
+  let remote=null;
+  try{ const r=await fetch('data.json',{cache:'no-store'}); if(r.ok){ const o=await r.json(); remote= o&&o.v===1 ? normalize(o) : defState(); dataOk=true; } }catch(e){}
+  loadedAt=Date.now();
+  const p=lsGet(LP);
+  S = remote||defState();
+  if(p&&p.state&&dataOk) S=mergePending(S,p);
+  await loadPhotos(); render(); if(TM) openStage();
+  art = await use('artifact');
+  if(art && dataOk){ sync='cloud'; if(lsGet(LP)){ setSync('saving'); publishNow(); } }
+  else { const l=loadLocal(); if(l) S=l; sync='local'; await loadPhotos(); }
+  render();
+}
 try{ navigator.storage && navigator.storage.persist && navigator.storage.persist(); }catch(e){}
 
 const $ = id => document.getElementById(id);
@@ -302,9 +372,10 @@ async function loadPhotos(){
   try{
     const d=await db();
     const all=await new Promise((res,rej)=>{ const q=d.transaction('photos').objectStore('photos').getAll(); q.onsuccess=()=>res(q.result); q.onerror=()=>rej(q.error); });
-    photos.forEach(p=>URL.revokeObjectURL(p.url));
+    photos.forEach(p=>{ if(!p.cloud) URL.revokeObjectURL(p.url); });
     photos=all.sort((a,b)=>a.added-b.added).map(p=>({id:p.id,url:URL.createObjectURL(p.blob)}));
   }catch(e){ photos=[]; }
+  photos=S.photos.map(p=>({id:p.id,url:'/_blob/'+p.id,cloud:true})).concat(photos);
 }
 async function shrink(file){
   const url=URL.createObjectURL(file);
@@ -318,7 +389,12 @@ async function shrink(file){
 }
 async function addPhotos(files){
   let ok=0;
-  try{
+  if(assets){
+    for(const f of files){
+      try{ const blob=await shrink(f); if(!blob) continue; const r=await assets.upload(blob); S.photos.push({id:r.id,added:Date.now()}); ok++; }catch(e){}
+    }
+    if(ok) save();
+  } else try{
     const d=await db();
     for(const f of files){
       try{ const blob=await shrink(f); if(!blob) continue;
@@ -330,6 +406,12 @@ async function addPhotos(files){
   toast(ok? '已添加 '+ok+' 张照片' : '照片添加失败，换一张试试');
 }
 async function delPhoto(id){
+  const i=S.photos.findIndex(p=>p.id===id);
+  if(i>=0){
+    if(!assets){ toast('这张照片只能在能编辑的设备上删除'); return; }
+    try{ await assets.delete(id); }catch(e){ toast('删除失败，稍后再试'); return; }
+    S.photos.splice(i,1); save(); await loadPhotos(); return;
+  }
   try{ const d=await db(); await new Promise((res,rej)=>{ const t=d.transaction('photos','readwrite'); t.objectStore('photos').delete(id); t.oncomplete=res; t.onerror=()=>rej(t.error); }); }catch(e){}
   await loadPhotos();
 }
@@ -470,8 +552,14 @@ function renderLog(){
   h+='<button class="row tap" data-open="base"><span class="grow">初始能力值</span><span class="val">'+S.base.l+' / '+S.base.r+' / '+S.base.s+'</span><span class="chev">›</span></button>';
   h+='<button class="row tap" data-open="photos"><span class="grow">背景照片</span><span class="val">'+photos.length+' 张</span><span class="chev">›</span></button>';
   h+='<button class="row tap" data-open="backup"><span class="grow">备份与恢复</span><span class="chev">›</span></button>';
-  h+='</div><div class="gf">所有记录和照片只存在这台手机上，不联网也能用。换手机或删 app 前，先在「备份与恢复」导出一份。</div>';
+  h+='</div><div class="gf">'+storageNote()+'</div>';
   $('v-log').innerHTML=h;
+}
+
+function storageNote(){
+  if(TARGET==='pwa') return '所有记录和照片只存在这台手机上，不联网也能用。换手机或删 app 前，先在「备份与恢复」导出一份。';
+  return {loading:'正在读取记录…',cloud:'已同步。记录和照片保存在这个页面里，手机和电脑打开都能看到。',saving:'保存中…',
+    local:'这里不能同步，记录先存在这台设备的浏览器里。',readonly:'你只有查看权限，改动不会保存。'}[sync];
 }
 
 /* ---------- sheet / dialog / toast ---------- */
@@ -497,10 +585,10 @@ function drawSheet(){
     h+='<div class="card">'+ORDER.map(k=>stepRow(SK[k].name,'base.'+k,S.base[k],'')).join('')+'</div><div class="gf">这是开始记录之前的水平，满分 100。默认值是按留考日语 317 分估的：阅读 60、听力 50、口语 35。改了以后，修为会按新的起点重新计算。</div>';
   } else if(sheetKind==='photos'){
     h=head('背景照片','','完成');
-    h+='<button class="secondary" data-pick="1" style="margin-bottom:14px">从相册添加</button>';
+    if(TARGET==='pwa' || assets || sync==='local') h+='<button class="secondary" data-pick="1" style="margin-bottom:14px">从相册添加</button>';
     if(photos.length) h+='<div class="photos">'+photos.map(p=>'<div style="background-image:url(&quot;'+p.url+'&quot;)"><button data-delphoto="'+p.id+'" aria-label="删除这张照片">×</button></div>').join('')+'</div>';
     else h+='<div class="gf" style="text-align:center">还没有照片</div>';
-    h+='<div class="gf">照片会压缩后存在这台手机里，专注和打卡卡片会随机用它们做背景。</div>';
+    h+='<div class="gf">'+(assets? '照片会压缩后上传到这个页面，手机和电脑都能用。' : '照片会压缩后存在这台设备里。')+'专注和打卡卡片会随机用它们做背景。</div>';
   } else if(sheetKind==='backup'){
     h=head('备份与恢复','','完成');
     h+='<button class="secondary" data-export="1">导出备份</button><div class="gf" style="margin-bottom:16px">导出你的全部记录（不含照片），可以存到「文件」或发给自己。</div>';
@@ -556,11 +644,11 @@ function lockOff(){ try{ wake&&wake.release(); }catch(e){} wake=null; }
 function startPhase(phase){
   ensureAudio();
   const min= phase==='focus'? S.pomo.focus : S.pomo.rest, ms=min*60000;
-  S.timer={phase,k:S.pomo.k,total:ms,end:Date.now()+ms,left:null,photo:randPhotoId(),poem:anyPoem()};
-  save(); openStage();
+  TM={phase,k:S.pomo.k,total:ms,end:Date.now()+ms,left:null,photo:randPhotoId(),poem:anyPoem()};
+  saveT(); openStage();
 }
 function openStage(){
-  const T=S.timer; if(!T) return;
+  const T=TM; if(!T) return;
   setPhoto($('stagePhoto'), T.photo && photoUrl(T.photo) ? T.photo : randPhotoId());
   $('stagePoem').innerHTML=poemHTML(T.poem||0);
   $('stagePhase').textContent= T.phase==='focus'? '专注 · '+SK[T.k].name : '休息一下';
@@ -568,9 +656,9 @@ function openStage(){
   clearInterval(tickT); tickT=setInterval(tick,250); tick();
 }
 function closeStage(){ clearInterval(tickT); tickT=null; $('stage').classList.remove('on'); lockOff(); }
-function leftMs(){ const T=S.timer; return T.left!=null? T.left : T.end-Date.now(); }
+function leftMs(){ const T=TM; return T.left!=null? T.left : T.end-Date.now(); }
 function tick(){
-  const T=S.timer; if(!T){ closeStage(); return; }
+  const T=TM; if(!T){ closeStage(); return; }
   const left=leftMs();
   if(left<=0){ finishPhase(); return; }
   const sec=Math.ceil(left/1000);
@@ -579,28 +667,34 @@ function tick(){
   $('stagePause').textContent= T.left!=null? '继续' : '暂停';
 }
 function finishPhase(){
-  const T=S.timer; S.timer=null; save(); closeStage(); chime();
+  const T=TM; TM=null; saveT(); closeStage(); chime();
   if(T.phase==='focus'){ const res=addEntry(T.k, Math.round(T.total/60000), 'pomo'); showCard(res,true); }
   else toast('休息结束，继续加油');
 }
 function stopEarly(){
-  const T=S.timer; if(!T) return;
-  if(T.phase==='rest'){ S.timer=null; save(); closeStage(); return; }
-  const was=T.left; if(T.left==null){ T.left=leftMs(); save(); tick(); }
+  const T=TM; if(!T) return;
+  if(T.phase==='rest'){ TM=null; saveT(); closeStage(); return; }
+  const was=T.left; if(T.left==null){ T.left=leftMs(); saveT(); tick(); }
   const done=Math.floor((T.total-T.left)/60000);
-  const resume=()=>{ if(was==null){ T.end=Date.now()+T.left; T.left=null; save(); tick(); } };
-  if(done<1){ dialog('结束这次专注？','还不到 1 分钟，不会记录时间。',[{t:'结束',cls:'d',fn:()=>{ S.timer=null; save(); closeStage(); }},{t:'继续专注',cls:'b',fn:resume}]); return; }
+  const resume=()=>{ if(was==null){ T.end=Date.now()+T.left; T.left=null; saveT(); tick(); } };
+  if(done<1){ dialog('结束这次专注？','还不到 1 分钟，不会记录时间。',[{t:'结束',cls:'d',fn:()=>{ TM=null; saveT(); closeStage(); }},{t:'继续专注',cls:'b',fn:resume}]); return; }
   dialog('结束这次专注？','已经专注了 '+done+' 分钟。',[
-    {t:'记录 '+done+' 分钟',cls:'b',fn:()=>{ S.timer=null; save(); closeStage(); const res=addEntry(T.k,done,'pomo'); showCard(res,false); }},
-    {t:'不记录',cls:'d',fn:()=>{ S.timer=null; save(); closeStage(); }},
+    {t:'记录 '+done+' 分钟',cls:'b',fn:()=>{ TM=null; saveT(); closeStage(); const res=addEntry(T.k,done,'pomo'); showCard(res,false); }},
+    {t:'不记录',cls:'d',fn:()=>{ TM=null; saveT(); closeStage(); }},
     {t:'继续专注',fn:resume}
   ]);
 }
 
 /* ---------- export / import ---------- */
 async function exportData(){
-  const text=JSON.stringify({app:'xiulian',exported:new Date().toISOString(),state:Object.assign({},S,{timer:null})});
+  const text=JSON.stringify({app:'xiulian',exported:new Date().toISOString(),state:S});
   const name='日语修行备份-'+today()+'.json';
+  if(TARGET==='artifact'){
+    if(!dls){ toast('这里不能导出文件'); return; }
+    try{ await dls.save({filename:name,data:text}); toast('已导出'); }
+    catch(e){ if(!(e && e.code==='declined')) toast('导出失败'); }
+    return;
+  }
   try{
     const file=new File([text],name,{type:'application/json'});
     if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:name}); return; }
@@ -613,7 +707,7 @@ async function importData(file){
     const o=JSON.parse(await file.text()); const st=o&&o.state;
     if(!st || st.v!==1 || !Array.isArray(st.entries)) throw 0;
     dialog('从备份恢复？','备份里有 '+st.entries.length+' 条记录，会替换现在的记录。',[
-      {t:'恢复',cls:'b',fn:()=>{ S=normalize(Object.assign({},st,{timer:null})); save(); closeSheet(); render(); toast('已恢复'); }},
+      {t:'恢复',cls:'b',fn:()=>{ S=normalize(Object.assign({},st,{photos:S.photos})); save(); closeSheet(); render(); toast('已恢复'); }},
       {t:'取消'}]);
   }catch(e){ toast('这不是有效的备份文件'); }
 }
@@ -628,7 +722,7 @@ document.addEventListener('click',e=>{
   if(ds.pk){ S.pomo.k=ds.pk; save(); renderFocus(); return; }
   if(ds.step){ const [f,n]=ds.step.split(':'); const lim=f==='focus'?[5,120]:[1,30]; S.pomo[f]=Math.max(lim[0],Math.min(lim[1],S.pomo[f]+Number(n))); save(); renderFocus(); return; }
   if(b.id==='startFocus'){ startPhase('focus'); return; }
-  if(b.id==='stagePause'){ const T=S.timer; if(!T) return; if(T.left==null){ T.left=leftMs(); } else { T.end=Date.now()+T.left; T.left=null; } save(); tick(); return; }
+  if(b.id==='stagePause'){ const T=TM; if(!T) return; if(T.left==null){ T.left=leftMs(); } else { T.end=Date.now()+T.left; T.left=null; } saveT(); tick(); return; }
   if(b.id==='stageStop'){ stopEarly(); return; }
   if(ds.card){ $('cardModal').classList.remove('on'); if(ds.card==='rest') startPhase('rest'); return; }
   if(ds.day){ openDay= openDay===ds.day? null : ds.day; renderLog(); return; }
@@ -657,12 +751,15 @@ document.addEventListener('click',e=>{
 $('scrim').addEventListener('click',closeSheet);
 $('photoInput').addEventListener('change',async e=>{ const fs=[...e.target.files]; e.target.value=''; if(!fs.length) return; toast('正在添加…'); await addPhotos(fs); if(sheetKind==='photos') drawSheet(); render(); });
 $('importInput').addEventListener('change',e=>{ const f=e.target.files[0]; e.target.value=''; if(f) importData(f); });
-document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible'){ if(S.timer){ if(!$('stage').classList.contains('on')) openStage(); else { tick(); lockOn(); } } render(); } });
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden' && pubT) publishNow(); if(document.visibilityState==='visible'){ if(TM){ if(!$('stage').classList.contains('on')) openStage(); else { tick(); lockOn(); } } render(); } });
 
 /* ---------- start ---------- */
 render();
-loadPhotos().then(()=>{ render(); if(S.timer) openStage(); });
-if('serviceWorker' in navigator && location.protocol==='https:'){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
+if(TARGET==='artifact') bootCloud();
+else {
+  loadPhotos().then(()=>{ render(); if(TM) openStage(); });
+  if('serviceWorker' in navigator && location.protocol==='https:'){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
+}
 })();
 </script>
 </body>

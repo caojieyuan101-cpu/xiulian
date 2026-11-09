@@ -57,6 +57,22 @@ html = html.replace('/*POEMS*/[]', json.dumps(poems, ensure_ascii=False))
 open(os.path.join(DIST, 'index.html'), 'w', encoding='utf-8').write(html)
 print('index.html', round(len(html.encode()) / 1024), 'KB')
 
+# the same app as a Claude Artifact page: records sync through its data.json.
+# The Artifact tool wraps the page in its own document, so emit only the
+# title, the styles and the body; data.json is published once, with the first version.
+ART = os.path.join(SRC, 'artifact')
+os.makedirs(ART, exist_ok=True)
+title = re.search(r'<title>.*?</title>', html, re.S).group(0)
+style = re.search(r'<style>.*?</style>', html, re.S).group(0)
+body = re.search(r'<body>(.*)</body>', html, re.S).group(1)
+body = body.replace("/*TARGET*/'pwa'", "'artifact'")
+# the page frame already pads for the phone's safe areas at the top
+style = style.replace('</style>', 'main{padding-top:8px}\n</style>')
+open(os.path.join(ART, 'index.html'), 'w', encoding='utf-8').write(title + '\n' + style + '\n' + body.strip() + '\n')
+if not os.path.exists(os.path.join(ART, 'data.json')):
+    open(os.path.join(ART, 'data.json'), 'w', encoding='utf-8').write('{"v":1}')
+print('artifact/index.html', round(os.path.getsize(os.path.join(ART, 'index.html')) / 1024), 'KB')
+
 # icons: a radar triangle on deep indigo
 def icon(size):
     S = 1024
