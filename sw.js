@@ -1,5 +1,5 @@
-const CACHE = 'xiulian-34cd3bb22c';
-const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png', './bg-dusk.jpg'];
+const CACHE = 'xiulian-114f2d2997';
+const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png', './bg-dusk.jpg', './bg-street.jpg'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));

@@ -122,10 +122,13 @@ manifest = {
 }
 json.dump(manifest, open(os.path.join(DIST, 'manifest.webmanifest'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 
-# the background photo ships beside the page, for the site and the Claude page alike
-bg = open(os.path.join(SRC, 'bg-dusk.jpg'), 'rb').read()
-for d in (DIST, ART):
-    open(os.path.join(d, 'bg-dusk.jpg'), 'wb').write(bg)
+# the background photos ship beside the page, for the site and the Claude page alike
+bg = b''
+for name in ('bg-dusk.jpg', 'bg-street.jpg'):
+    data = open(os.path.join(SRC, name), 'rb').read()
+    bg += data
+    for d in (DIST, ART):
+        open(os.path.join(d, name), 'wb').write(data)
 ver = hashlib.sha1(html.encode() + bg).hexdigest()[:10]
 sw = open(os.path.join(SRC, 'sw.js'), encoding='utf-8').read().replace('__VERSION__', ver)
 open(os.path.join(DIST, 'sw.js'), 'w', encoding='utf-8').write(sw)
