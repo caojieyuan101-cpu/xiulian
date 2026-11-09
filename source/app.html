@@ -128,7 +128,7 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 
 /* poem on photo */
 .photo{position:absolute;inset:0;background-size:cover;background-position:center;background-color:#1b1719}
-.photo.empty{background-image:var(--sky);background-position:center bottom}
+.photo.empty{background-image:url(bg-dusk.jpg);background-position:center 55%}
 .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.42) 0%,rgba(0,0,0,.05) 38%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.68) 100%)}
 .poem{display:flex;flex-direction:row-reverse;gap:.55em;color:#fff;font-family:var(--serif);text-shadow:0 1px 12px rgba(0,0,0,.45)}
 .poem .pc{writing-mode:vertical-rl;text-orientation:upright;letter-spacing:.22em;line-height:1}
@@ -204,9 +204,10 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 .legend b,.trio b,.statbig .tot b{font-family:var(--serif)}
 .trio b,.statbig .tot b{color:var(--gold)}
 .skycard{position:relative;color:#fff}
-.skycard>svg{position:absolute;inset:0 0 -1px;width:100%;height:calc(100% + 1px)}
+.skycard{background:#1b1719 url(bg-dusk.jpg) 85% 60%/170% auto}
+.skycard::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(27,23,25,.42),rgba(27,23,25,.08) 62%),linear-gradient(0deg,rgba(27,23,25,.35),transparent 45%)}
 .skycard .rings{position:relative;padding:16px 16px 34px}
-.skycard .legend b{color:#fff}
+.skycard .legend b{color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.35)}
 .skycard .legend small{color:rgba(255,255,255,.75)}
 .seal{position:absolute;display:grid;place-items:center;font-family:var(--serif);font-weight:700;color:#fff;background:var(--s);border-radius:8px;width:46px;height:46px;font-size:25px;right:14px;top:12px;transform:rotate(-8deg);box-shadow:inset 0 0 0 2px rgba(255,236,210,.95),inset 0 0 0 3.5px var(--s);animation:stamp .35s cubic-bezier(.3,1.6,.5,1)}
 .qcard .seal{left:22px;top:24px;right:auto;width:56px;height:56px;font-size:30px;transform:rotate(-9deg);z-index:1}
@@ -448,31 +449,8 @@ function addEntry(k,m,src,day,extra){
   return {k,m,before,after,pi};
 }
 
-/* ---------- sunset sky ---------- */
-// slate-mauve clouds at the top burning down to coral and gold, a city wall and tree tops in silhouette,
-// optional bare branches from the top-left
-let skyN=0;
-function skySVG(w,h,wallH,opt){
-  opt=opt||{}; const id='sky'+(skyN++), m=opt.merlon||6, step=m*3.2, y=h-wallH;
-  let s='<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="'+(opt.par||'none')+'" aria-hidden="true"><defs>'
-   +'<linearGradient id="'+id+'g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5f566c"/><stop offset=".38" stop-color="#9b7a85"/><stop offset=".62" stop-color="#d9644a"/><stop offset=".8" stop-color="#ec8a4a"/><stop offset=".9" stop-color="#f1b24a"/></linearGradient>'
-   +'<filter id="'+id+'f"><feTurbulence type="fractalNoise" baseFrequency=".012 .05" numOctaves="3" seed="'+(opt.seed||3)+'"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 .55  0 0 0 0 .4  0 0 0 1.4 -.55"/></filter>'
-   +'</defs><rect width="'+w+'" height="'+h+'" fill="url(#'+id+'g)"/><rect width="'+w+'" height="'+(h*.8)+'" filter="url(#'+id+'f)" opacity=".55"/>';
-  let t='M'+(w*.62)+' '+(y+m); for(let x=w*.62;x<=w;x+=9) t+=' L'+(x+4.5).toFixed(1)+' '+(y-8-((x*7)%11)).toFixed(1)+' L'+(x+9).toFixed(1)+' '+(y+m);
-  s+='<path d="'+t+' Z" fill="#2a2023"/>';
-  let d='M0 '+h+' V'+(y+m); for(let x=4;x<w;x+=step) d+=' H'+x.toFixed(1)+' V'+y+' H'+(x+m*1.6).toFixed(1)+' V'+(y+m);
-  s+='<path d="'+d+' H'+w+' V'+h+' Z" fill="#1c1718"/>';
-  if(opt.branch){
-    let seed=5; const rnd=()=>((seed=seed*16807%2147483647)/2147483647); let g='';
-    (function grow(x,y,a,len,sw,depth){ const x2=x+Math.cos(a)*len, y2=y+Math.sin(a)*len;
-      g+='<path d="M'+x.toFixed(1)+' '+y.toFixed(1)+' L'+x2.toFixed(1)+' '+y2.toFixed(1)+'" stroke="#1c1718" stroke-width="'+sw.toFixed(2)+'" stroke-linecap="round"/>';
-      if(depth>0) for(let i=0;i<2+(rnd()<.4?1:0);i++) grow(x2,y2,a+(rnd()-.5)*1.1,len*(.62+rnd()*.18),sw*.62,depth-1); })(-10,h*.26,-0.55,w*.18,7,6);
-    s+='<g opacity=".92">'+g+'</g>';
-  }
-  return s+'</svg>';
-}
-// full-bleed background for the timer and the check-in card when there are no photos
-document.documentElement.style.setProperty('--sky','url("data:image/svg+xml,'+encodeURIComponent(skySVG(400,640,140,{par:'xMidYMax slice',merlon:9,branch:true,seed:7}))+'")');
+/* ---------- dusk ---------- */
+// backgrounds use bg-dusk.jpg, a sunset over the city wall
 function todayMet(){ const o={l:0,r:0,s:0}; for(const e of S.entries) if(e.d===today()) o[e.k]+=e.m; return ORDER.every(k=>o[k]>=S.goals[k]); }
 const SEAL='<div class="seal" aria-label="今日达标">修</div>';
 
@@ -497,7 +475,7 @@ function ringSVG(){
 function renderToday(){
   const t=today(), d=new Date(), tm=minsOn(t), all=minsAll();
   let h='<div class="lt">今天</div><div class="sub">'+(d.getMonth()+1)+'月'+d.getDate()+'日 星期'+WEEK[d.getDay()]+'</div>';
-  h+='<div class="card skycard">'+skySVG(364,200,20,{merlon:5,seed:11})+(todayMet()? SEAL : '')+'<div class="rings">'+ringSVG()+'<div class="legend">';
+  h+='<div class="card skycard">'+(todayMet()? SEAL : '')+'<div class="rings">'+ringSVG()+'<div class="legend">';
   ORDER.forEach(k=>{ h+='<div><span style="color:'+RLAB[k]+'">'+SK[k].name+'</span><b>'+minsOn(t,k)+'<small> / '+S.goals[k]+' 分钟</small></b></div>'; });
   h+='</div></div></div>';
   h+='<div class="gt">记录时间</div><div class="card">';

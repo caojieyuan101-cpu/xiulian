@@ -122,7 +122,11 @@ manifest = {
 }
 json.dump(manifest, open(os.path.join(DIST, 'manifest.webmanifest'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 
-ver = hashlib.sha1(html.encode()).hexdigest()[:10]
+# the background photo ships beside the page, for the site and the Claude page alike
+bg = open(os.path.join(SRC, 'bg-dusk.jpg'), 'rb').read()
+for d in (DIST, ART):
+    open(os.path.join(d, 'bg-dusk.jpg'), 'wb').write(bg)
+ver = hashlib.sha1(html.encode() + bg).hexdigest()[:10]
 sw = open(os.path.join(SRC, 'sw.js'), encoding='utf-8').read().replace('__VERSION__', ver)
 open(os.path.join(DIST, 'sw.js'), 'w', encoding='utf-8').write(sw)
 open(os.path.join(DIST, '.nojekyll'), 'w').write('')
