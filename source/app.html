@@ -7,35 +7,34 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="修行">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" href="icon-192.png">
 <title>日语修行</title>
 <style>
-/*FONTFACE*/
 :root{
-  /* layout: iOS-style large titles, grouped inset cards, bottom tab bar; poems set vertically on photos */
-  --bg:#f2f2f7; --card:#ffffff; --fill:rgba(120,120,128,.12); --fill2:rgba(120,120,128,.2);
-  --label:#000; --label2:rgba(60,60,67,.6); --label3:rgba(60,60,67,.3); --sep:rgba(60,60,67,.2);
-  --l:#5856d6; --r:#ff9500; --s:#ff2d55; --accent:#5856d6; --good:#34c759; --danger:#ff3b30;
-  --ui:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Hiragino Sans GB","Noto Sans SC",system-ui,sans-serif;
-  --serif:"XiuSerif","Songti SC","STSong","Noto Serif SC",serif;
+  /* layout: iOS-style large titles, grouped inset cards, bottom tab bar; poems set vertically on photos.
+     colour: greys only, the three skills are three depths of grey, blue marks what you can tap */
+  --bg:#f5f5f7; --card:#ffffff; --fill:rgba(120,120,128,.12); --fill2:rgba(120,120,128,.2);
+  --label:#1d1d1f; --label2:#6e6e73; --label3:#aeaeb2; --sep:#d2d2d7;
+  --l:#1d1d1f; --r:#6e6e73; --s:#b8b8bd; --accent:#0071e3; --good:#1d1d1f; --danger:#e30000;
+  --ui:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Helvetica Neue","Hiragino Sans GB","Noto Sans SC",system-ui,sans-serif;
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#000; --card:#1c1c1e; --fill:rgba(118,118,128,.24); --fill2:rgba(118,118,128,.32);
-    --label:#fff; --label2:rgba(235,235,245,.6); --label3:rgba(235,235,245,.3); --sep:rgba(84,84,88,.65);
-    --l:#5e5ce6; --r:#ff9f0a; --s:#ff375f; --accent:#7d7aff; --good:#30d158; --danger:#ff453a;
+    --label:#f5f5f7; --label2:#98989d; --label3:#636366; --sep:#38383a;
+    --l:#f5f5f7; --r:#98989d; --s:#58585c; --accent:#2997ff; --good:#f5f5f7; --danger:#ff453a;
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
     --bg:#000; --card:#1c1c1e; --fill:rgba(118,118,128,.24); --fill2:rgba(118,118,128,.32);
-    --label:#fff; --label2:rgba(235,235,245,.6); --label3:rgba(235,235,245,.3); --sep:rgba(84,84,88,.65);
-    --l:#5e5ce6; --r:#ff9f0a; --s:#ff375f; --accent:#7d7aff; --good:#30d158; --danger:#ff453a;
+    --label:#f5f5f7; --label2:#98989d; --label3:#636366; --sep:#38383a;
+    --l:#f5f5f7; --r:#98989d; --s:#58585c; --accent:#2997ff; --good:#f5f5f7; --danger:#ff453a;
     color-scheme:dark;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -60,7 +59,7 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 .row .val{color:var(--label2);font-variant-numeric:tabular-nums;white-space:nowrap}
 .chev{color:var(--label3);font-size:20px;line-height:1}
 .tap:active{background:var(--fill)}
-.ico{width:28px;height:28px;border-radius:7px;display:grid;place-items:center;color:#fff;flex:none;font-size:14px;font-weight:600}
+.ico{width:28px;height:28px;border-radius:7px;display:grid;place-items:center;color:var(--label);background:var(--fill);flex:none;font-size:14px;font-weight:600}
 .plus{width:30px;height:30px;border-radius:50%;background:var(--fill);display:grid;place-items:center;color:var(--accent);font-size:20px;font-weight:500;flex:none}
 
 /* today */
@@ -70,13 +69,14 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 .legend div{display:flex;flex-direction:column}
 .legend b{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.15}
 .legend small{font-size:13px;color:var(--label2)}
-.legend span{font-size:13px;font-weight:600}
+.legend span{font-size:13px;font-weight:500;color:var(--label2);display:flex;align-items:center;gap:6px}
+.sw{width:8px;height:8px;border-radius:50%;flex:none;display:inline-block}
 .trio{display:grid;grid-template-columns:repeat(3,1fr)}
 .trio div{padding:14px 12px;display:flex;flex-direction:column;gap:2px}
 .trio div+div{border-left:.5px solid var(--sep)}
 .trio b{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
 .trio small{font-size:12px;color:var(--label2)}
-.mini-poem{font-family:var(--serif);font-size:17px;line-height:1.7;padding:16px;-webkit-user-select:text;user-select:text}
+.mini-poem{font-family:var(--ui);font-size:17px;line-height:1.7;padding:16px;-webkit-user-select:text;user-select:text}
 .mini-poem small{display:block;font-family:var(--ui);font-size:13px;color:var(--label2);margin-top:6px}
 
 /* focus */
@@ -99,7 +99,7 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 /* skill */
 .realm{padding:18px 16px 16px;display:flex;flex-direction:column;gap:4px}
 .realm .eyebrow{font-size:13px;color:var(--label2)}
-.realm h2{margin:0;font-family:var(--serif);font-size:34px;font-weight:700;letter-spacing:.12em}
+.realm h2{margin:0;font-family:var(--ui);font-size:34px;font-weight:600;letter-spacing:.06em}
 .realm p{margin:0;font-size:15px;color:var(--label2)}
 .bar{height:6px;border-radius:3px;background:var(--fill);overflow:hidden;margin-top:12px}
 .bar i{display:block;height:100%;border-radius:3px;background:var(--accent)}
@@ -124,12 +124,15 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 .tab.on{color:var(--accent)}
 
 /* poem on photo */
-.photo{position:absolute;inset:0;background-size:cover;background-position:center;background-color:#1d1b2e}
-.photo.empty{background-image:radial-gradient(120% 80% at 80% 10%,#3b3560 0%,transparent 60%),radial-gradient(90% 70% at 10% 90%,#5a2f3f 0%,transparent 60%),linear-gradient(160deg,#1c1a2b,#0e0d16)}
+.photo{position:absolute;inset:0;background-size:cover;background-position:center;background-color:#1c1c1e}
+.photo.empty{background-image:linear-gradient(165deg,#3a3a3c 0%,#1c1c1e 55%,#0b0b0c 100%)}
 .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.42) 0%,rgba(0,0,0,.05) 38%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.68) 100%)}
-.poem{display:flex;flex-direction:row-reverse;gap:.55em;color:#fff;font-family:var(--serif);text-shadow:0 1px 12px rgba(0,0,0,.45)}
-.poem .pc{writing-mode:vertical-rl;text-orientation:upright;letter-spacing:.22em;line-height:1}
-.poem .pa{writing-mode:vertical-rl;font-size:.52em;letter-spacing:.12em;opacity:.85;align-self:flex-end;margin-right:.35em;font-family:var(--serif)}
+.poem{display:flex;flex-direction:row-reverse;gap:.6em;color:#fff;font-family:var(--ui);text-shadow:0 1px 10px rgba(0,0,0,.35)}
+/* columns are stacked characters, so no font needs vertical metrics */
+.poem .pc,.poem .pa{display:flex;flex-direction:column;align-items:center;gap:.24em}
+.poem i{font-style:normal;line-height:1;display:block}
+.poem .pc{font-weight:300}
+.poem .pa{font-size:.52em;gap:.14em;opacity:.85;align-self:flex-end;margin-right:.35em}
 
 /* stage (timer) */
 #stage{position:fixed;inset:0;z-index:40;display:none;color:#fff;background:#000}
@@ -179,7 +182,7 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 .photos div{position:relative;aspect-ratio:3/4;background-size:cover;background-position:center;background-color:var(--fill)}
 .photos button{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:15px;line-height:26px}
 .plist{display:flex;flex-direction:column;gap:10px}
-.plist div{background:var(--card);border-radius:14px;padding:14px 16px;font-family:var(--serif);font-size:17px;line-height:1.7;-webkit-user-select:text;user-select:text}
+.plist div{background:var(--card);border-radius:14px;padding:14px 16px;font-family:var(--ui);font-size:17px;line-height:1.7;-webkit-user-select:text;user-select:text}
 .plist small{display:block;font-family:var(--ui);font-size:13px;color:var(--label2);margin-top:4px}
 #dialog{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;padding:24px}
 #dialog.on{display:flex}
@@ -362,7 +365,8 @@ function pickPoem(){
 function anyPoem(){ return Math.floor(Math.random()*POEMS.length); }
 function poemHTML(i){
   const p=POEMS[i]; const cols=p[0].split(/[，。？！；、：]/).filter(Boolean);
-  return '<div class="poem">'+cols.map(c=>'<span class="pc">'+esc(c)+'</span>').join('')+'<span class="pa">'+esc(p[1])+'《'+esc(p[2])+'》</span></div>';
+  const stack=t=>[...t].map(ch=>'<i>'+esc({'《':'︽','》':'︾','·':'・'}[ch]||ch)+'</i>').join('');
+  return '<div class="poem" aria-label="'+esc(p[0]+' '+p[1]+'《'+p[2]+'》')+'">'+cols.map(c=>'<span class="pc" aria-hidden="true">'+stack(c)+'</span>').join('')+'<span class="pa" aria-hidden="true">'+stack(p[1]+'《'+p[2]+'》')+'</span></div>';
 }
 
 /* ---------- photos (IndexedDB, stays on this phone) ---------- */
@@ -442,7 +446,7 @@ function ringSVG(){
   const t=today(), R=[60,45,30], c=72; let s='<svg viewBox="0 0 144 144" aria-hidden="true">';
   ORDER.forEach((k,i)=>{
     const r=R[i], circ=2*Math.PI*r, p=Math.min(1,minsOn(t,k)/Math.max(1,S.goals[k]));
-    s+='<circle cx="'+c+'" cy="'+c+'" r="'+r+'" fill="none" stroke="'+SK[k].c+'" stroke-opacity=".2" stroke-width="13"/>';
+    s+='<circle cx="'+c+'" cy="'+c+'" r="'+r+'" fill="none" stroke="var(--fill)" stroke-width="13"/>';
     if(p>0) s+='<circle cx="'+c+'" cy="'+c+'" r="'+r+'" fill="none" stroke="'+SK[k].c+'" stroke-width="13" stroke-linecap="round" stroke-dasharray="'+(p*circ).toFixed(2)+' '+circ.toFixed(2)+'" transform="rotate(-90 '+c+' '+c+')"/>';
   });
   return s+'</svg>';
@@ -451,10 +455,10 @@ function renderToday(){
   const t=today(), d=new Date(), tm=minsOn(t), all=minsAll();
   let h='<div class="lt">今天</div><div class="sub">'+(d.getMonth()+1)+'月'+d.getDate()+'日 星期'+WEEK[d.getDay()]+'</div>';
   h+='<div class="card pad"><div class="rings">'+ringSVG()+'<div class="legend">';
-  ORDER.forEach(k=>{ h+='<div><span style="color:'+SK[k].c+'">'+SK[k].name+'</span><b>'+minsOn(t,k)+'<small> / '+S.goals[k]+' 分钟</small></b></div>'; });
+  ORDER.forEach(k=>{ h+='<div><span><i class="sw" style="background:'+SK[k].c+'"></i>'+SK[k].name+'</span><b>'+minsOn(t,k)+'<small> / '+S.goals[k]+' 分钟</small></b></div>'; });
   h+='</div></div></div>';
   h+='<div class="gt">记录时间</div><div class="card">';
-  ORDER.forEach(k=>{ h+='<button class="row ind tap" data-add="'+k+'"><span class="ico" style="background:'+SK[k].c+'">'+SK[k].name[0]+'</span><span class="grow">'+SK[k].name+'</span><span class="val">'+fmtMin(minsOn(t,k))+'</span><span class="plus" aria-hidden="true">+</span></button>'; });
+  ORDER.forEach(k=>{ h+='<button class="row ind tap" data-add="'+k+'"><span class="ico">'+SK[k].name[0]+'</span><span class="grow">'+SK[k].name+'</span><span class="val">'+fmtMin(minsOn(t,k))+'</span><span class="plus" aria-hidden="true">+</span></button>'; });
   h+='</div>';
   h+='<div class="gt">概览</div><div class="card trio"><div><b>'+tm+'</b><small>今日分钟</small></div><div><b>'+fmtH(all)+'</b><small>累计小时</small></div><div><b>'+streak()+'</b><small>连续天数</small></div></div>';
   if(S.last && S.last.d===t){
@@ -484,13 +488,12 @@ function radarSVG(){
   ORDER.forEach(k=>{ const [x,y]=pt(k,100); s+='<line x1="'+cx+'" y1="'+cy+'" x2="'+x.toFixed(1)+'" y2="'+y.toFixed(1)+'" stroke="var(--sep)" stroke-width=".7"/>'; });
   s+='<polygon points="'+poly(S.base)+'" fill="none" stroke="var(--label3)" stroke-width="1.2" stroke-dasharray="4 4"/>';
   const cur={l:val('l'),r:val('r'),s:val('s')};
-  s+='<defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--l)"/><stop offset=".55" stop-color="var(--s)"/><stop offset="1" stop-color="var(--r)"/></linearGradient></defs>';
-  s+='<polygon points="'+poly(cur)+'" fill="url(#rg)" fill-opacity=".28" stroke="url(#rg)" stroke-width="2.2" stroke-linejoin="round"/>';
-  ORDER.forEach(k=>{ const [x,y]=pt(k,cur[k]); s+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="4.5" fill="'+SK[k].c+'" stroke="var(--card)" stroke-width="2"/>'; });
+  s+='<polygon points="'+poly(cur)+'" fill="var(--accent)" fill-opacity=".12" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>';
+  ORDER.forEach(k=>{ const [x,y]=pt(k,cur[k]); s+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="4" fill="var(--accent)" stroke="var(--card)" stroke-width="2"/>'; });
   const lab={l:[cx,cy-R-30,'middle'], r:[cx+Math.cos(Math.PI/6)*R+6, cy+Math.sin(Math.PI/6)*R+30,'middle'], s:[cx-Math.cos(Math.PI/6)*R-6, cy+Math.sin(Math.PI/6)*R+30,'middle']};
   ORDER.forEach(k=>{ const [x,y,a]=lab[k];
     s+='<text x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" text-anchor="'+a+'" font-size="13" fill="var(--label2)" font-family="var(--ui)">'+SK[k].name+'</text>';
-    s+='<text x="'+x.toFixed(1)+'" y="'+(y+21).toFixed(1)+'" text-anchor="'+a+'" font-size="19" font-weight="600" fill="'+SK[k].c+'" font-family="var(--ui)" style="font-variant-numeric:tabular-nums">'+cur[k].toFixed(1)+'</text>'; });
+    s+='<text x="'+x.toFixed(1)+'" y="'+(y+21).toFixed(1)+'" text-anchor="'+a+'" font-size="19" font-weight="600" fill="var(--label)" font-family="var(--ui)" style="font-variant-numeric:tabular-nums">'+cur[k].toFixed(1)+'</text>'; });
   return s+'</svg>';
 }
 function renderSkill(){
@@ -502,7 +505,7 @@ function renderSkill(){
   h+='<div class="card radar" style="margin-top:12px">'+radarSVG()+'</div>';
   h+='<div class="gt">各项修为</div><div class="card">';
   ORDER.forEach(k=>{ const n=minsToNext(k);
-    h+='<div class="row ind"><span class="ico" style="background:'+SK[k].c+'">'+SK[k].name[0]+'</span><span class="grow">'+SK[k].name+'<br><small style="color:var(--label2);font-size:13px">累计 '+fmtMin(minsAll(k))+'</small></span><span class="val">'+(n? '再练 '+fmtMin(n)+' +1' : '圆满')+'</span></div>'; });
+    h+='<div class="row ind"><span class="ico">'+SK[k].name[0]+'</span><span class="grow">'+SK[k].name+'<br><small style="color:var(--label2);font-size:13px">累计 '+fmtMin(minsAll(k))+'</small></span><span class="val">'+(n? '再练 '+fmtMin(n)+' +1' : '圆满')+'</span></div>'; });
   h+='</div><div class="gf">虚线是起点。能力值按累计练习时间增长，越接近 100 越难涨：每天练 1 小时，一年后大约能涨 20 分；想到 95 以上，要练一千多个小时。起点可以在「记录 › 初始能力值」里改。</div>';
   $('v-skill').innerHTML=h;
 }
@@ -529,7 +532,7 @@ function chartSVG(){
 function renderLog(){
   const all=minsAll();
   let h='<div class="lt">记录</div><div class="sub">累计 '+fmtMin(all)+'</div>';
-  h+='<div class="card trio">'+ORDER.map(k=>'<div><small style="color:'+SK[k].c+';font-weight:600">'+SK[k].name+'</small><b>'+fmtH(minsAll(k))+'</b><small>小时</small></div>').join('')+'</div>';
+  h+='<div class="card trio">'+ORDER.map(k=>'<div><small style="display:flex;align-items:center;gap:6px"><i class="sw" style="background:'+SK[k].c+'"></i>'+SK[k].name+'</small><b>'+fmtH(minsAll(k))+'</b><small>小时</small></div>').join('')+'</div>';
   h+='<div class="gt">近 14 天</div><div class="card pad chart">'+chartSVG()+'</div>';
   const days=[...new Set(S.entries.map(e=>e.d))].sort().reverse().slice(0,60);
   h+='<div class="gt">每日记录</div><div class="card">';
@@ -540,7 +543,7 @@ function renderLog(){
     if(openDay===d){
       h+='<div class="day-entries">';
       S.entries.filter(e=>e.d===d).sort((a,b)=>a.t-b.t).forEach(e=>{ const tt=new Date(e.t);
-        h+='<div class="entry"><span class="ico" style="background:'+SK[e.k].c+';width:20px;height:20px;border-radius:5px;font-size:11px">'+SK[e.k].name[0]+'</span><span class="grow">'+String(tt.getHours()).padStart(2,'0')+':'+String(tt.getMinutes()).padStart(2,'0')+' · '+(e.src==='pomo'?'番茄钟':'手动')+'</span><span class="num">'+e.m+' 分</span><button data-del="'+e.id+'">删除</button></div>'; });
+        h+='<div class="entry"><span class="ico" style="width:20px;height:20px;border-radius:5px;font-size:11px">'+SK[e.k].name[0]+'</span><span class="grow">'+String(tt.getHours()).padStart(2,'0')+':'+String(tt.getMinutes()).padStart(2,'0')+' · '+(e.src==='pomo'?'番茄钟':'手动')+'</span><span class="num">'+e.m+' 分</span><button data-del="'+e.id+'">删除</button></div>'; });
       h+='</div>';
     }
   });
@@ -574,7 +577,7 @@ function drawSheet(){
   if(sheetKind==='add'){
     h=head('记录'+SK[addK].name,'取消','记录');
     h+='<div class="seg" style="margin-top:4px">'+['今天','昨天'].map((t,i)=>'<button class="'+(addDay===i?'on':'')+'" data-addday="'+i+'">'+t+'</button>').join('')+'</div>';
-    h+='<div class="big-min"><b style="color:'+SK[addK].c+'">'+addM+'</b><small>分钟</small></div>';
+    h+='<div class="big-min"><b>'+addM+'</b><small>分钟</small></div>';
     h+='<div class="chips">'+[5,10,15,20,30,45,60,90].map(n=>'<button class="chip'+(addM===n?' on':'')+'" data-addm="'+n+'">'+n+'</button>').join('')+'</div>';
     h+='<div class="card">'+'<div class="row"><span class="grow">微调</span><span class="stepper"><button data-addstep="-1" aria-label="减 1 分钟">−</button><button data-addstep="1" aria-label="加 1 分钟">+</button></span></div></div>';
   } else if(sheetKind==='goals'){
