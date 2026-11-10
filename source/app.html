@@ -73,7 +73,7 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 .seg{display:flex;background:var(--fill);border-radius:9px;padding:2px;gap:2px}
 .seg button{flex:1;min-height:34px;padding:6px 0;border-radius:7px;font-size:15px;font-weight:500}
 .seg button.on{background:#40363a;box-shadow:0 3px 8px rgba(0,0,0,.25)}
-.face{display:grid;place-items:center;margin:26px 0 8px;position:relative}
+.face{display:grid;place-items:center;margin:18px auto 4px;position:relative;width:100%}
 .face svg{width:min(72vw,280px);height:min(72vw,280px)}
 .face .t{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:4px}
 .face .t b{font-family:var(--serif);font-size:min(17vw,66px);font-weight:400;font-variant-numeric:tabular-nums;letter-spacing:.01em}
@@ -157,7 +157,7 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 #stage .ctrl button:active{background:rgba(255,255,255,.3)}
 #stage.paused .clock{opacity:.45}
 #stage .ctrl button[hidden]{display:none}
-.today-sum{display:flex;justify-content:center;gap:6px;font-size:15px;color:var(--label2);margin:4px 0 0}
+.today-sum{display:flex;justify-content:center;gap:6px;font-size:15px;color:var(--label2);margin:16px 0 0}
 .today-sum b{color:var(--label);font-weight:600;font-variant-numeric:tabular-nums}
 
 /* check-in card */
@@ -214,7 +214,7 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 .skycard{background-color:#1b1719;background-repeat:no-repeat}
 .skycard{background-image:linear-gradient(165deg,#3a3135 0%,#1b1719 75%)}
 .photo.empty{background-image:linear-gradient(165deg,#3a3135 0%,#1b1719 75%)}
-.wphint{position:absolute;right:10px;bottom:10px;z-index:1;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(27,23,25,.45);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#fff;pointer-events:none}
+.wphint{position:absolute;right:10px;top:10px;z-index:1;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(27,23,25,.45);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#fff;pointer-events:none}
 .wphint svg{width:18px;height:18px}
 .skycard.tapwp{cursor:pointer}
 .skycard.tapwp:active{filter:brightness(.92)}
@@ -229,9 +229,43 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 .wpdel{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:15px;line-height:26px;text-align:center}
 .chk{color:var(--accent);font-weight:600;width:20px;text-align:right}
 .skycard::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(20,15,17,.66),rgba(20,15,17,.42) 58%,rgba(20,15,17,.14)),linear-gradient(0deg,rgba(20,15,17,.4),transparent 50%)}
-.skycard .rings{position:relative;padding:16px 16px 34px}
-.skycard .legend b{color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.35)}
-.skycard .legend small{color:rgba(255,255,255,.75)}
+.skycard .hero{position:relative;display:flex;align-items:center;gap:14px;padding:14px 10px 26px 14px}
+.skycard .hero svg{width:118px;height:118px;flex:none}
+.hrows{flex:1;min-width:0;display:flex;flex-direction:column}
+.hrow{display:flex;align-items:center;gap:8px;min-height:46px;width:100%;text-align:left}
+.hrow .dot{width:9px;height:9px;border-radius:50%;flex:none}
+.hrow .nm{font-size:15px;width:32px;flex:none}
+.hrow .v{flex:1;font-size:13px;color:rgba(255,255,255,.75);white-space:nowrap}
+.hrow .v b{font-family:var(--serif);font-size:22px;font-weight:600;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.35)}
+.hrow .add{width:32px;height:32px;border-radius:50%;background:rgba(240,122,82,.92);color:#fff;display:grid;place-items:center;font-size:21px;line-height:1;flex:none;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.hrow:active .add{transform:scale(.92)}
+.skycard .seal{left:12px;top:10px;right:auto}
+.strip{display:grid;grid-template-columns:1fr 1fr;margin-top:12px}
+.strip div{padding:12px 16px;display:flex;flex-direction:column;gap:2px}
+.strip div+div{border-left:.5px solid var(--sep)}
+.strip b{font-family:var(--serif);font-size:26px;font-weight:600;color:var(--gold);line-height:1.2}
+.strip small{font-size:13px;color:var(--label2)}
+/* focus */
+.kchips{display:flex;gap:8px;justify-content:center;margin-top:14px}
+.kchip{display:flex;align-items:center;gap:6px;min-height:36px;padding:0 16px;border-radius:999px;background:var(--fill);font-size:15px}
+.kchip i{width:8px;height:8px;border-radius:50%}
+.kchip.on{background:color-mix(in srgb,var(--c) 24%,transparent);box-shadow:inset 0 0 0 1.5px var(--c)}
+.face.tapdial{cursor:pointer}
+.face .edit{font-size:13px;color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 50%,transparent);border-radius:999px;padding:2px 10px;margin-top:6px}
+.face:active .edit{background:color-mix(in srgb,var(--accent) 18%,transparent)}
+/* the timer, folded into a bar above the tabs */
+#stageMin{position:absolute;top:calc(env(safe-area-inset-top) + 12px);left:14px;z-index:2;width:44px;height:44px;border-radius:50%;background:rgba(0,0,0,.28);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:#fff;display:grid;place-items:center}
+#stageMin svg{width:22px;height:22px}
+#mini{position:fixed;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom) + 64px);z-index:11;max-width:576px;margin:0 auto;display:flex;align-items:center;gap:4px;height:58px;border-radius:16px;background:color-mix(in srgb,#30262a 92%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:0 8px 22px rgba(0,0,0,.4);padding:0 6px 0 8px}
+#mini[hidden]{display:none}
+#miniOpen{flex:1;min-width:0;display:flex;align-items:center;gap:10px;height:100%;text-align:left}
+#miniOpen svg{width:32px;height:32px;flex:none}
+#miniOpen .t{display:flex;flex-direction:column;min-width:0}
+#miniOpen small{font-size:13px;color:var(--label2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#miniOpen b{font-family:var(--serif);font-size:20px;font-weight:600;font-variant-numeric:tabular-nums}
+#miniPause{width:44px;height:44px;border-radius:50%;background:var(--fill2);display:grid;place-items:center;flex:none}
+#miniPause svg{width:18px;height:18px}
+body.has-mini main{padding-bottom:calc(env(safe-area-inset-bottom) + 160px)}
 .seal{position:absolute;display:grid;place-items:center;font-family:var(--serif);font-weight:700;color:#fff;background:var(--seal);border-radius:8px;width:46px;height:46px;font-size:25px;right:14px;top:12px;transform:rotate(-8deg);box-shadow:inset 0 0 0 2px rgba(255,236,210,.95),inset 0 0 0 3.5px var(--seal);animation:stamp .35s cubic-bezier(.3,1.6,.5,1)}
 .qcard .seal{left:22px;top:24px;right:auto;width:56px;height:56px;font-size:30px;transform:rotate(-9deg);z-index:1}
 @keyframes stamp{from{transform:scale(1.8) rotate(-8deg);opacity:0}to{transform:rotate(-8deg);opacity:1}}
@@ -255,6 +289,7 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 
 <div id="stage" aria-live="polite">
   <div class="photo" id="stagePhoto"></div><div class="shade"></div>
+  <button id="stageMin" aria-label="收起计时"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
   <div id="stagePoem"></div>
   <div class="bottom">
     <div class="phase" id="stagePhase"></div>
@@ -265,6 +300,7 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
   </div>
 </div>
 
+<div id="mini" hidden><button id="miniOpen" aria-label="打开计时"><svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="14" fill="none" stroke="rgba(255,236,228,.15)" stroke-width="4"/><circle id="miniRing" cx="18" cy="18" r="14" fill="none" stroke="var(--l)" stroke-width="4" stroke-linecap="round" stroke-dasharray="0 88" transform="rotate(-90 18 18)"/></svg><span class="t"><small id="miniPhase"></small><b id="miniClock">00:00</b></span></button><button id="miniPause" aria-label="暂停"></button></div>
 <div id="cardModal" role="dialog" aria-modal="true" aria-label="打卡卡片"></div>
 <div class="scrim" id="scrim"></div>
 <div id="sheet" role="dialog" aria-modal="true" inert></div>
@@ -357,7 +393,7 @@ async function bootCloud(){
   const p=lsGet(LP);
   S = remote||defState();
   if(p&&p.state&&dataOk) S=mergePending(S,p);
-  await loadPhotos(); if(WP.mode==='open' && !TM) stepWp(); render(); if(TM) openStage();
+  await loadPhotos(); if(WP.mode==='open' && !TM) stepWp(); render(); resumeTimer();
   art = await use('artifact');
   if(art && dataOk){ sync='cloud'; if(lsGet(LP)){ setSync('saving'); publishNow(); } }
   else { const l=loadLocal(); if(l) S=l; sync='local'; await loadPhotos(); }
@@ -516,16 +552,15 @@ function ringSVG(){
   return s+'</svg>';
 }
 function renderToday(){
-  const t=today(), d=new Date(), tm=minsOn(t), all=minsAll();
+  const t=today(), d=new Date();
   let h='<div class="lt">今天</div><div class="sub">'+(d.getMonth()+1)+'月'+d.getDate()+'日 星期'+WEEK[d.getDay()]+'</div>';
   const tapWp=WP.mode==='tap' && wpList().length>1;
-  h+='<div class="card skycard'+(tapWp?' tapwp':'')+'" style="'+wpStyle()+'"'+(tapWp?' role="button" aria-label="换一张壁纸"':'')+'>'+(todayMet()? SEAL : '')+(tapWp?'<span class="wphint" aria-hidden="true">'+SWAP_ICON+'</span>':'')+'<div class="rings">'+ringSVG()+'<div class="legend">';
-  ORDER.forEach(k=>{ h+='<div><span style="color:'+RLAB[k]+'">'+SK[k].name+'</span><b>'+minsOn(t,k)+'<small> / '+S.goals[k]+' 分钟</small></b></div>'; });
-  h+='</div></div></div>';
-  h+='<div class="gt">记录时间</div><div class="card">';
-  ORDER.forEach(k=>{ h+='<button class="row ind tap" data-add="'+k+'"><span class="ico" style="background:'+SK[k].c+'">'+SK[k].name[0]+'</span><span class="grow">'+SK[k].name+'</span><span class="val">'+fmtMin(minsOn(t,k))+'</span><span class="plus" aria-hidden="true">+</span></button>'; });
-  h+='</div>';
-  h+='<div class="gt">概览</div><div class="card trio"><div><b>'+tm+'</b><small>今日分钟</small></div><div><b>'+fmtH(all)+'</b><small>累计小时</small></div><div><b>'+streak()+'</b><small>连续天数</small></div></div>';
+  // rings on the wallpaper, and each skill's row carries its own + button
+  h+='<div class="card skycard'+(tapWp?' tapwp':'')+'" style="'+wpStyle()+'">'+(todayMet()? SEAL : '')+(tapWp?'<span class="wphint" aria-hidden="true">'+SWAP_ICON+'</span>':'')
+    +'<div class="hero">'+ringSVG()+'<div class="hrows">'
+    +ORDER.map(k=>'<button class="hrow" data-add="'+k+'" aria-label="记录'+SK[k].name+'，今天 '+minsOn(t,k)+' 分钟，目标 '+S.goals[k]+' 分钟"><i class="dot" style="background:'+RING[k]+'"></i><span class="nm">'+SK[k].name+'</span><span class="v"><b>'+minsOn(t,k)+'</b> / '+S.goals[k]+' 分</span><span class="add" aria-hidden="true">+</span></button>').join('')
+    +'</div></div></div>';
+  h+='<div class="card strip"><div><b>'+streak()+'</b><small>连续天数</small></div><div><b>'+fmtH(minsAll())+'</b><small>累计小时</small></div></div>';
   if(S.last && S.last.d===t){
     const p=POEMS[S.last.pi];
     h+='<div class="gt">今日诗签</div><button class="card tap mini-poem" style="width:100%;text-align:left" data-reopen="1">'+esc(p[0])+'<small>'+esc(p[1])+'《'+esc(p[2])+'》</small></button>';
@@ -535,20 +570,18 @@ function renderToday(){
 function focusToday(){ let n=0, m=0; for(const e of S.entries) if(e.d===today() && (e.src==='pomo'||e.src==='free')){ m+=e.m; if(e.full) n++; } return {n,m}; }
 function renderFocus(){
   const P=S.pomo, free=P.mode==='free', ft=focusToday();
-  let h='<div class="lt">专注</div><div class="sub">'+(free? '想学多久学多久，结束时把时间记进所选的一项' : '番茄钟结束后，时间自动记进所选的一项')+'</div>';
+  let h='<div class="lt">专注</div><div class="sub">'+(free? '想学多久学多久，结束时记进所选的一项' : '结束后自动记进所选的一项')+'</div>';
   h+='<div class="seg" role="tablist" aria-label="计时方式">'+[['pomo','番茄钟'],['free','正计时']].map(([m,t])=>'<button class="'+(P.mode===m?'on':'')+'" data-pmode="'+m+'" role="tab" aria-selected="'+(P.mode===m)+'">'+t+'</button>').join('')+'</div>';
-  h+='<div class="seg" role="tablist" aria-label="练习项目" style="margin-top:8px">'+ORDER.map(k=>'<button class="'+(P.k===k?'on':'')+'" data-pk="'+k+'" role="tab" aria-selected="'+(P.k===k)+'">'+SK[k].name+'</button>').join('')+'</div>';
+  h+='<div class="kchips" role="radiogroup" aria-label="练习项目">'+ORDER.map(k=>'<button class="kchip'+(P.k===k?' on':'')+'" style="--c:'+SK[k].c+'" data-pk="'+k+'" role="radio" aria-checked="'+(P.k===k)+'"><i style="background:'+SK[k].c+'"></i>'+SK[k].name+'</button>').join('')+'</div>';
   const r=118, circ=2*Math.PI*r;
-  h+='<div class="face"><svg viewBox="0 0 260 260" aria-hidden="true"><circle cx="130" cy="130" r="'+r+'" fill="none" stroke="var(--fill)" stroke-width="8"/>'+(free?'':'<circle cx="130" cy="130" r="'+r+'" fill="none" stroke="'+SK[P.k].c+'" stroke-width="8" stroke-linecap="round" stroke-dasharray="'+circ+' '+circ+'" transform="rotate(-90 130 130)"/>')+'</svg><div class="t"><b>'+(free? '00:00' : String(P.focus).padStart(2,'0')+':00')+'</b><small>'+SK[P.k].name+(free? ' · 从 0 开始计时' : ' · 休息 '+P.rest+' 分钟')+'</small></div></div>';
+  // in pomodoro mode the dial is the way to change the durations
+  h+=(free? '<div class="face">' : '<button class="face tapdial" data-open="durations" aria-label="修改时长：专注 '+P.focus+' 分钟，休息 '+P.rest+' 分钟">')
+    +'<svg viewBox="0 0 260 260" aria-hidden="true"><circle cx="130" cy="130" r="'+r+'" fill="none" stroke="var(--fill)" stroke-width="8"/>'+(free?'':'<circle cx="130" cy="130" r="'+r+'" fill="none" stroke="'+SK[P.k].c+'" stroke-width="8" stroke-linecap="round" stroke-dasharray="'+circ+' '+circ+'" transform="rotate(-90 130 130)"/>')+'</svg>'
+    +'<div class="t"><b>'+(free? '00:00' : String(P.focus).padStart(2,'0')+':00')+'</b><small>'+(free? '从 0 开始计时' : '休息 '+P.rest+' 分 · 长休息 '+P.long+' 分')+'</small>'+(free?'':'<span class="edit">点按修改时长</span>')+'</div>'
+    +(free? '</div>' : '</button>');
+  h+='<div style="margin-top:14px"><button class="primary" id="startFocus">'+(free?'开始计时':'开始专注')+'</button></div>';
   h+='<div class="today-sum">今天'+(ft.n? ' <b>'+ft.n+'</b> 个番茄 ·' : '')+' 专注 <b>'+fmtMin(ft.m)+'</b></div>';
-  h+='<div style="margin-top:16px"><button class="primary" id="startFocus">'+(free?'开始计时':'开始专注')+'</button></div>';
-  if(!free){
-    h+='<div class="card" style="margin-top:14px">';
-    h+='<div class="row"><span class="grow">专注时长</span><span class="val">'+P.focus+' 分钟</span><span class="stepper"><button data-step="focus:-5" aria-label="减少专注时长">−</button><button data-step="focus:5" aria-label="增加专注时长">+</button></span></div>';
-    h+='<div class="row"><span class="grow">短休息</span><span class="val">'+P.rest+' 分钟</span><span class="stepper"><button data-step="rest:-1" aria-label="减少短休息">−</button><button data-step="rest:1" aria-label="增加短休息">+</button></span></div>';
-    h+='<div class="row"><span class="grow">长休息<br><small style="color:var(--label2);font-size:13px">每完成 4 个番茄</small></span><span class="val">'+P.long+' 分钟</span><span class="stepper"><button data-step="long:-5" aria-label="减少长休息">−</button><button data-step="long:5" aria-label="增加长休息">+</button></span></div></div>';
-  }
-  h+='<div class="gf">'+(free? '计时到 3 小时会自动暂停，问你还在不在学。' : '专注时可以随时暂停，快结束时可以再加 5 分钟。')+' '+(wpList().length? '背景是你的壁纸和一句诗词。' : '到「记录 › 壁纸」添加照片，专注时就用它做背景。')+'</div>';
+  h+='<div class="gf" style="text-align:center">'+(free? '计时到 3 小时会自动暂停，问你还在不在学。' : '计时时可以暂停、拖动进度、再加 5 分钟，也可以收起。')+'</div>';
   $('v-focus').innerHTML=h;
 }
 function radarSVG(){
@@ -771,6 +804,10 @@ function drawSheet(){
     h+='<div class="big-min"><b style="color:'+SK[addK].c+'">'+addM+'</b><small>分钟</small></div>';
     h+='<div class="chips">'+[5,10,15,20,30,45,60,90].map(n=>'<button class="chip'+(addM===n?' on':'')+'" data-addm="'+n+'">'+n+'</button>').join('')+'</div>';
     h+='<div class="card">'+'<div class="row"><span class="grow">微调</span><span class="stepper"><button data-addstep="-1" aria-label="减 1 分钟">−</button><button data-addstep="1" aria-label="加 1 分钟">+</button></span></div></div>';
+  } else if(sheetKind==='durations'){
+    const P=S.pomo, row=(f,label,sub,step)=>'<div class="row"><span class="grow">'+label+(sub?'<br><small style="color:var(--label2);font-size:13px">'+sub+'</small>':'')+'</span><span class="val">'+P[f]+' 分钟</span><span class="stepper"><button data-step="'+f+':-'+step+'" aria-label="减少'+label+'">−</button><button data-step="'+f+':'+step+'" aria-label="增加'+label+'">+</button></span></div>';
+    h=head('番茄钟时长','','完成');
+    h+='<div class="card">'+row('focus','专注','',5)+row('rest','短休息','',1)+row('long','长休息','每完成 4 个番茄',5)+'</div><div class="gf">专注每次加减 5 分钟，短休息 1 分钟，长休息 5 分钟。</div>';
   } else if(sheetKind==='goals'){
     h=head('每日目标','','完成');
     h+='<div class="card">'+ORDER.map(k=>stepRow(SK[k].name,'goals.'+k,S.goals[k],' 分钟')).join('')+'</div><div class="gf">每次加减 5 分钟。圆环转满一圈就是达到当天目标。</div>';
@@ -856,13 +893,21 @@ function openStage(){
   const T=TM; if(!T) return;
   paintWp($('stagePhoto'));
   $('stagePoem').innerHTML=poemHTML(T.poem||0);
-  $('stagePhase').textContent= T.phase==='rest'? (T.total>S.pomo.rest*60000? '长休息' : '休息一下') : isFree(T)? '正计时 · '+SK[T.k].name : '专注 · '+SK[T.k].name+(T.round? ' · 第 '+T.round+' 个番茄' : '');
+  setPhaseLabel(T);
   $('stageMore').hidden= T.phase!=='focus' || isFree(T);
   $('stageStop').textContent= T.phase==='rest'? '跳过' : '结束';
+  if(T.mini){ T.mini=false; saveT(); }
+  $('mini').hidden=true; document.body.classList.remove('has-mini');
   $('stage').classList.add('on'); lockOn();
-  clearInterval(tickT); tickT=setInterval(tick,250); tick();
+  startTicker();
 }
-function closeStage(){ clearInterval(tickT); tickT=null; $('stage').classList.remove('on','paused'); lockOff(); document.title='日语修行'; }
+function setPhaseLabel(T){ $('stagePhase').textContent= T.phase==='rest'? (T.total>S.pomo.rest*60000? '长休息' : '休息一下') : isFree(T)? '正计时 · '+SK[T.k].name : '专注 · '+SK[T.k].name+(T.round? ' · 第 '+T.round+' 个番茄' : ''); }
+function startTicker(){ clearInterval(tickT); tickT=setInterval(tick,250); tick(); }
+// fold the running timer into a bar above the tabs; it keeps counting
+function foldStage(){ const T=TM; if(!T) return; setPhaseLabel(T); T.mini=true; saveT(); $('stage').classList.remove('on'); lockOff(); $('mini').hidden=false; document.body.classList.add('has-mini'); startTicker(); }
+function resumeTimer(){ if(!TM) return; if(TM.mini) foldStage(); else openStage(); }
+function closeStage(){ clearInterval(tickT); tickT=null; $('stage').classList.remove('on','paused'); $('mini').hidden=true; document.body.classList.remove('has-mini'); lockOff(); document.title='日语修行'; }
+const PAUSE_ICON='<svg viewBox="0 0 20 20" fill="currentColor"><rect x="5" y="4" width="3.4" height="12" rx="1"/><rect x="11.6" y="4" width="3.4" height="12" rx="1"/></svg>', PLAY_ICON='<svg viewBox="0 0 20 20" fill="currentColor"><path d="M6 4.2v11.6c0 .6.7 1 1.2.6l8.4-5.8c.4-.3.4-.9 0-1.2L7.2 3.6C6.7 3.2 6 3.6 6 4.2z"/></svg>';
 function pauseToggle(){
   const T=TM; if(!T) return;
   if(isFree(T)){ if(T.left==null) T.left=Date.now()-T.start; else { T.start=Date.now()-T.left; T.left=null; } }
@@ -887,6 +932,13 @@ function tick(){
   $('stageBar').setAttribute('aria-valuenow',Math.round(fill*100));
   $('stageBar').setAttribute('aria-valuetext',(isFree(T)? '已计时 ' : '还剩 ')+clockText(sec));
   const txt=clockText(sec);
+  if(TM.mini){   // the folded bar
+    $('miniClock').textContent=txt;
+    $('miniPhase').textContent=$('stagePhase').textContent||(T.phase==='rest'? '休息一下' : (isFree(T)? '正计时 · ' : '专注 · ')+SK[T.k].name);
+    $('miniRing').setAttribute('stroke-dasharray',(fill*88).toFixed(1)+' 88');
+    $('miniRing').setAttribute('stroke', T.phase==='rest'? 'var(--gold)' : SK[T.k].c);
+    const paused=T.left!=null; $('miniPause').innerHTML= paused? PLAY_ICON : PAUSE_ICON; $('miniPause').setAttribute('aria-label', paused? '继续' : '暂停');
+  }
   $('stageClock').textContent=txt;
   $('stagePause').textContent= T.left!=null? '继续' : '暂停';
   $('stage').classList.toggle('paused', T.left!=null);
@@ -976,7 +1028,7 @@ async function importData(file){
 
 /* ---------- events ---------- */
 document.addEventListener('click',e=>{
-  if(WP.mode==='tap' && e.target.closest('.skycard.tapwp')){ stepWp(); renderToday(); return; }
+  if(WP.mode==='tap' && e.target.closest('.skycard.tapwp') && !e.target.closest('button')){ stepWp(); renderToday(); return; }
   const b=e.target.closest('button'); if(!b) return;
   const ds=b.dataset;
   if(ds.tab){ tab=ds.tab; document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t===b)); document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+tab)); render(); window.scrollTo(0,0); return; }
@@ -984,9 +1036,11 @@ document.addEventListener('click',e=>{
   if(ds.reopen){ reopenCard(); return; }
   if(ds.pk){ S.pomo.k=ds.pk; save(); renderFocus(); return; }
   if(ds.pmode){ S.pomo.mode=ds.pmode; save(); renderFocus(); return; }
-  if(ds.step){ const [f,n]=ds.step.split(':'); const lim={focus:[5,120],rest:[1,30],long:[5,60]}[f]; S.pomo[f]=Math.max(lim[0],Math.min(lim[1],S.pomo[f]+Number(n))); save(); renderFocus(); return; }
+  if(ds.step){ const [f,n]=ds.step.split(':'); const lim={focus:[5,120],rest:[1,30],long:[5,60]}[f]; S.pomo[f]=Math.max(lim[0],Math.min(lim[1],S.pomo[f]+Number(n))); save(); renderFocus(); if(sheetKind==='durations') drawSheet(); return; }
   if(b.id==='startFocus'){ startPhase('focus'); return; }
-  if(b.id==='stagePause'){ pauseToggle(); return; }
+  if(b.id==='stagePause'||b.id==='miniPause'){ pauseToggle(); return; }
+  if(b.id==='stageMin'){ foldStage(); return; }
+  if(b.id==='miniOpen'){ openStage(); return; }
   if(b.id==='stageMore'){ const T=TM; if(!T||isFree(T)||T.phase!=='focus') return; T.total+=300000; if(T.left!=null) T.left+=300000; else T.end+=300000; saveT(); tick(); toast('多专注 5 分钟'); return; }
   if(b.id==='stageStop'){ stopEarly(); return; }
   if(ds.card){ $('cardModal').classList.remove('on'); if(ds.card==='rest') startPhase('rest',nextRest); return; }
@@ -1027,13 +1081,13 @@ document.addEventListener('click',e=>{
 $('scrim').addEventListener('click',closeSheet);
 $('photoInput').addEventListener('change',async e=>{ const fs=[...e.target.files]; e.target.value=''; if(!fs.length) return; toast('正在添加…'); await addPhotos(fs); if(sheetKind==='photos') drawSheet(); render(); });
 $('importInput').addEventListener('change',e=>{ const f=e.target.files[0]; e.target.value=''; if(f) importData(f); });
-document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden'){ hiddenAt=Date.now(); if(pubT) publishNow(); } if(document.visibilityState==='visible'){ if(WP.mode==='open' && hiddenAt && Date.now()-hiddenAt>60000 && !TM) stepWp(); if(TM){ if(!$('stage').classList.contains('on')) openStage(); else { tick(); lockOn(); } } render(); } });
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden'){ hiddenAt=Date.now(); if(pubT) publishNow(); } if(document.visibilityState==='visible'){ if(WP.mode==='open' && hiddenAt && Date.now()-hiddenAt>60000 && !TM) stepWp(); if(TM){ if(TM.mini) foldStage(); else if(!$('stage').classList.contains('on')) openStage(); else { tick(); lockOn(); } } render(); } });
 
 /* ---------- start ---------- */
 render();
 if(TARGET==='artifact') bootCloud();
 else {
-  loadPhotos().then(()=>{ if(WP.mode==='open' && !TM) stepWp(); render(); if(TM) openStage(); });
+  loadPhotos().then(()=>{ if(WP.mode==='open' && !TM) stepWp(); render(); resumeTimer(); });
   if('serviceWorker' in navigator && location.protocol==='https:'){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
 }
 })();
