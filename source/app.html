@@ -26,6 +26,8 @@
   color-scheme:dark;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{touch-action:manipulation}
+button,[role=button],[role=slider]{touch-action:manipulation}
 html,body{height:100%;margin:0}
 body{background:var(--bg);color:var(--label);font-family:var(--ui);font-size:17px;line-height:1.35;-webkit-font-smoothing:antialiased;overscroll-behavior-y:none;-webkit-user-select:none;user-select:none}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
@@ -140,8 +142,15 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 #stage .bottom{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 28px);display:flex;flex-direction:column;align-items:center;gap:6px;padding:0 24px}
 #stage .phase{font-size:15px;opacity:.85;letter-spacing:.08em}
 #stage .clock{font-size:76px;font-weight:200;font-variant-numeric:tabular-nums;line-height:1;text-shadow:0 2px 20px rgba(0,0,0,.35)}
-#stage .track{width:min(70vw,280px);height:3px;border-radius:2px;background:rgba(255,255,255,.25);overflow:hidden;margin:10px 0 18px}
-#stage .track i{display:block;height:100%;background:#fff}
+#stage .track{position:relative;width:min(76vw,300px);height:34px;margin:2px 0 8px;display:flex;align-items:center;cursor:pointer;touch-action:none}
+#stage .rail{width:100%;height:4px;border-radius:2px;background:rgba(255,255,255,.25);overflow:hidden;transition:height .15s}
+#stage .rail i{display:block;height:100%;background:#fff}
+#stage .knob{position:absolute;top:50%;left:0;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:#fff;box-shadow:0 1px 6px rgba(0,0,0,.35);transition:transform .15s}
+#stage.dragging .rail{height:7px}
+#stage.dragging .knob{transform:scale(1.35)}
+#stage .track:focus-visible{outline:2px solid #fff;outline-offset:4px;border-radius:8px}
+#stage .hint{font-size:13px;opacity:0;transition:opacity .2s;margin-top:-6px;height:16px;text-shadow:0 1px 6px rgba(0,0,0,.7)}
+#stage.dragging .hint{opacity:.85}
 #stage .ctrl{display:flex;gap:16px}
 #stage .ctrl button{width:76px;height:76px;border-radius:50%;background:rgba(255,255,255,.18);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);font-size:15px;font-weight:500;color:#fff}
 #stage .ctrl button:active{background:rgba(255,255,255,.3)}
@@ -247,7 +256,8 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
   <div class="bottom">
     <div class="phase" id="stagePhase"></div>
     <div class="clock" id="stageClock">25:00</div>
-    <div class="track"><i id="stageTrack"></i></div>
+    <div class="track" id="stageBar" role="slider" tabindex="0" aria-label="拖动调整时间" aria-valuemin="0" aria-valuemax="100"><div class="rail"><i id="stageTrack"></i></div><b class="knob" id="stageKnob"></b></div>
+    <div class="hint" id="stageHint"></div>
     <div class="ctrl"><button id="stagePause">暂停</button><button id="stageMore">+5 分钟</button><button id="stageStop">结束</button></div>
   </div>
 </div>
@@ -859,23 +869,54 @@ function pauseToggle(){
 }
 function tick(){
   const T=TM; if(!T){ closeStage(); return; }
-  let sec;
+  let sec, fill;
   if(isFree(T)){
-    const el=elapsedMs(T);
-    if(el>=FREE_CAP && T.left==null && !T.capAsked){ T.capAsked=true; pauseToggle(); chime(); stopEarly('已经计时 3 小时，还在学吗？'); return; }
-    sec=Math.floor(el/1000);
-    $('stageTrack').style.width=(el%3600000/36000).toFixed(2)+'%'; // one lap per hour
+    let el=elapsedMs(T);
+    if(drag) el=dragTarget(T,drag.f);
+    else if(el>=FREE_CAP && T.left==null && !T.capAsked){ T.capAsked=true; pauseToggle(); chime(); stopEarly('已经计时 3 小时，还在学吗？'); return; }
+    sec=Math.floor(el/1000); fill=el%3600000/3600000; // one lap per hour
   } else {
-    const left=leftMs(); if(left<=0){ finishPhase(); return; }
-    sec=Math.ceil(left/1000);
-    $('stageTrack').style.width=((1-left/T.total)*100).toFixed(2)+'%';
+    let left=leftMs();
+    if(drag) left=dragTarget(T,drag.f); else if(left<=0){ finishPhase(); return; }
+    sec=Math.ceil(left/1000); fill=1-left/T.total;
   }
+  $('stageTrack').style.width=(fill*100).toFixed(2)+'%';
+  $('stageKnob').style.left=(fill*100).toFixed(2)+'%';
+  $('stageBar').setAttribute('aria-valuenow',Math.round(fill*100));
+  $('stageBar').setAttribute('aria-valuetext',(isFree(T)? '已计时 ' : '还剩 ')+clockText(sec));
   const txt=clockText(sec);
   $('stageClock').textContent=txt;
   $('stagePause').textContent= T.left!=null? '继续' : '暂停';
   $('stage').classList.toggle('paused', T.left!=null);
   document.title=txt+' · '+(T.phase==='rest'? '休息' : SK[T.k].name);
 }
+/* dragging the bar: countdowns move the remaining time, the stopwatch moves within the current hour */
+let drag=null;
+function dragTarget(T,f){ // snaps to whole minutes
+  const M=60000;
+  if(isFree(T)) return Math.floor(elapsedMs(T)/3600000)*3600000+Math.round(f*60)*M;   // elapsed
+  if(f>=.995) return 3000;                                                            // the very end: a few seconds left
+  return Math.max(M,Math.round(T.total*(1-f)/M)*M);                                   // remaining
+}
+function barFrac(e){ const r=$('stageBar').getBoundingClientRect(); return Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)); }
+function setBar(f){
+  const T=TM; if(!T) return; const v=dragTarget(T,f);
+  if(isFree(T)){ if(T.left!=null) T.left=v; else T.start=Date.now()-v; }
+  else { if(T.left!=null) T.left=v; else T.end=Date.now()+v; }
+  saveT();
+}
+function dragHint(){ const T=TM; if(!T||!drag) return ''; return isFree(T)? '已计时 '+clockText(Math.floor(dragTarget(T,drag.f)/1000)) : '已过 '+fmtMin((T.total-dragTarget(T,drag.f))/60000)+' · 还剩 '+fmtMin(dragTarget(T,drag.f)/60000); }
+(function(){
+  const bar=$('stageBar');
+  const show=()=>{ $('stageHint').textContent=dragHint(); tick(); };
+  bar.addEventListener('pointerdown',e=>{ if(!TM) return; e.preventDefault(); try{ bar.setPointerCapture(e.pointerId); }catch(_){} drag={f:barFrac(e)}; $('stage').classList.add('dragging'); show(); });
+  bar.addEventListener('pointermove',e=>{ if(!drag) return; drag.f=barFrac(e); show(); });
+  const end=commit=>()=>{ if(!drag) return; const f=drag.f; drag=null; $('stage').classList.remove('dragging'); if(commit) setBar(f); tick(); };
+  bar.addEventListener('pointerup',end(true)); bar.addEventListener('pointercancel',end(false)); bar.addEventListener('lostpointercapture',end(true));
+  bar.addEventListener('keydown',e=>{ const T=TM; if(!T) return; const d={ArrowRight:1,ArrowUp:1,ArrowLeft:-1,ArrowDown:-1}[e.key]; if(!d) return; e.preventDefault();
+    const span= isFree(T)? 3600000 : T.total, cur= isFree(T)? elapsedMs(T)%3600000/3600000 : 1-leftMs()/T.total;
+    setBar(Math.max(0,Math.min(1,cur+d*60000/span))); tick(); });
+})();
 function finishPhase(){
   const T=TM; TM=null; saveT(); closeStage(); chime();
   if(T.phase==='focus'){
