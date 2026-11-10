@@ -17,10 +17,11 @@
 :root{
   /* layout: iOS-style large titles, grouped inset cards, bottom tab bar; poems set vertically on photos.
      colour: one dark "dusk" theme taken from two sunset photos - warm silhouette black, sunset coral,
-     evening gold and dusk mauve. Deliberately single-theme: it looks the same in light and dark mode. */
+     evening gold, dusk mauve and sunset pink. Orange (--accent) is only for things you can tap; red only for
+     destructive actions; the three skills are mauve / gold / pink everywhere. Deliberately single-theme: it looks the same in light and dark mode. */
   --bg:#1b1719; --card:#262023; --fill:rgba(255,236,228,.08); --fill2:rgba(255,236,228,.15);
   --label:#f4e9e6; --label2:#a3929a; --label3:#6f6369; --sep:#3a3135;
-  --l:#a986ad; --r:#e9ac3c; --s:#e65a3e; --accent:#f07a52; --gold:#ffd27a; --good:#e9ac3c; --danger:#ff6b55;
+  --l:#a986ad; --r:#e9ac3c; --s:#e8798f; --accent:#f07a52; --gold:#ffd27a; --good:#e9ac3c; --danger:#ff453a; --seal:#e65a3e;
   --ui:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Hiragino Sans GB","Noto Sans SC",system-ui,sans-serif;
   --serif:"XiuSerif","Songti SC","STSong","Noto Serif SC",serif;
   color-scheme:dark;
@@ -49,7 +50,7 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 .row .val{color:var(--label2);font-variant-numeric:tabular-nums;white-space:nowrap}
 .chev{color:var(--label3);font-size:20px;line-height:1}
 .tap:active{background:var(--fill)}
-.ico{width:28px;height:28px;border-radius:7px;display:grid;place-items:center;color:#fff;flex:none;font-size:14px;font-weight:600}
+.ico{width:28px;height:28px;border-radius:7px;display:grid;place-items:center;color:#fff;flex:none;font-size:13px;font-weight:600}
 .plus{width:30px;height:30px;border-radius:50%;background:var(--fill);display:grid;place-items:center;color:var(--accent);font-size:20px;font-weight:500;flex:none}
 
 /* today */
@@ -64,19 +65,19 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 .trio div{padding:14px 12px;display:flex;flex-direction:column;gap:2px}
 .trio div+div{border-left:.5px solid var(--sep)}
 .trio b{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}
-.trio small{font-size:12px;color:var(--label2)}
+.trio small{font-size:13px;color:var(--label2)}
 .mini-poem{font-family:var(--serif);font-size:17px;line-height:1.7;padding:16px;-webkit-user-select:text;user-select:text}
 .mini-poem small{display:block;font-family:var(--ui);font-size:13px;color:var(--label2);margin-top:6px}
 
 /* focus */
 .seg{display:flex;background:var(--fill);border-radius:9px;padding:2px;gap:2px}
-.seg button{flex:1;padding:6px 0;border-radius:7px;font-size:14px;font-weight:500}
+.seg button{flex:1;min-height:34px;padding:6px 0;border-radius:7px;font-size:15px;font-weight:500}
 .seg button.on{background:#40363a;box-shadow:0 3px 8px rgba(0,0,0,.25)}
 .face{display:grid;place-items:center;margin:26px 0 8px;position:relative}
 .face svg{width:min(72vw,280px);height:min(72vw,280px)}
 .face .t{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:4px}
-.face .t b{font-size:min(17vw,68px);font-weight:200;font-variant-numeric:tabular-nums;letter-spacing:.01em}
-.face .t small{font-size:14px;color:var(--label2)}
+.face .t b{font-family:var(--serif);font-size:min(17vw,66px);font-weight:400;font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.face .t small{font-size:13px;color:var(--label2)}
 .stepper{display:flex;align-items:center;background:var(--fill);border-radius:9px;overflow:hidden;flex:none}
 .stepper button{width:44px;height:32px;font-size:20px;color:var(--label)}
 .stepper button:active{background:var(--fill2)}
@@ -92,7 +93,7 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 .realm p{margin:0;font-size:15px;color:var(--label2)}
 .bar{height:6px;border-radius:3px;background:var(--fill);overflow:hidden;margin-top:12px}
 .bar i{display:block;height:100%;border-radius:3px;background:var(--accent)}
-.realm .meta{display:flex;justify-content:space-between;font-size:12px;color:var(--label2);margin-top:6px}
+.realm .meta{display:flex;justify-content:space-between;font-size:13px;color:var(--label2);margin-top:6px}
 .radar{display:grid;place-items:center;padding:8px 0 4px}
 .radar svg{width:100%;max-width:340px;height:auto;overflow:visible}
 
@@ -101,12 +102,12 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 .day-entries{padding:0 16px 10px 52px;display:flex;flex-direction:column;gap:2px}
 .entry{display:flex;align-items:center;gap:10px;font-size:15px;padding:6px 0}
 .entry .grow{flex:1;color:var(--label2)}
-.entry button{color:var(--danger);font-size:14px;padding:4px 8px}
+.entry button{color:var(--danger);font-size:15px;min-height:44px;padding:0 4px 0 12px}
 .segs{display:flex;height:6px;width:64px;border-radius:3px;overflow:hidden;background:var(--fill);flex:none}
 .segs i{display:block;height:100%}
 .pnav{display:flex;align-items:center;justify-content:space-between;margin:12px 0 10px}
 .pnav b{font-size:17px;font-weight:600}
-.pnav button,.pnav span{width:44px;height:36px;font-size:26px;line-height:1;color:var(--accent);display:grid;place-items:center}
+.pnav button,.pnav span{width:44px;height:44px;font-size:26px;line-height:1;color:var(--accent);display:grid;place-items:center}
 .pnav button:active{opacity:.5}
 .statbig .tot{padding:16px 16px 4px;display:flex;flex-direction:column;gap:2px}
 .statbig .tot small{font-size:13px;color:var(--label2)}
@@ -117,7 +118,7 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 .share .grow{display:flex;flex-direction:column;gap:6px}
 .share .sh{display:flex;justify-content:space-between;gap:8px}
 .row .bar{margin-top:6px}
-.met{font-size:11px;font-weight:600;color:var(--good);border:1px solid currentColor;border-radius:5px;padding:0 4px;margin-left:4px;vertical-align:2px}
+.met{display:inline-block;white-space:nowrap;font-size:11px;font-weight:600;line-height:16px;color:var(--good);border:1px solid currentColor;border-radius:5px;padding:0 4px;margin-left:6px;vertical-align:2px}
 .heat-legend{display:flex;align-items:center;gap:4px;justify-content:flex-end;font-size:11px;color:var(--label2);margin-top:8px}
 .heat-legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
 
@@ -141,7 +142,7 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 #stage .poem{position:absolute;top:calc(env(safe-area-inset-top) + 36px);right:24px;font-size:24px}
 #stage .bottom{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 28px);display:flex;flex-direction:column;align-items:center;gap:6px;padding:0 24px}
 #stage .phase{font-size:15px;opacity:.85;letter-spacing:.08em}
-#stage .clock{font-size:76px;font-weight:200;font-variant-numeric:tabular-nums;line-height:1;text-shadow:0 2px 20px rgba(0,0,0,.35)}
+#stage .clock{font-family:var(--serif);font-size:72px;font-weight:400;font-variant-numeric:tabular-nums;line-height:1;text-shadow:0 2px 20px rgba(0,0,0,.35)}
 #stage .track{position:relative;width:min(76vw,300px);height:34px;margin:2px 0 8px;display:flex;align-items:center;cursor:pointer;touch-action:none}
 #stage .rail{width:100%;height:4px;border-radius:2px;background:rgba(255,255,255,.25);overflow:hidden;transition:height .15s}
 #stage .rail i{display:block;height:100%;background:#fff}
@@ -167,7 +168,7 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 .qcard .info{position:absolute;left:20px;right:20px;bottom:18px;display:flex;flex-direction:column;gap:2px}
 .qcard .info .stamp{font-size:13px;opacity:.8;letter-spacing:.05em}
 .qcard .info b{font-size:24px;font-weight:600}
-.qcard .info span{font-size:14px;opacity:.9;font-variant-numeric:tabular-nums}
+.qcard .info span{font-size:15px;opacity:.9;font-variant-numeric:tabular-nums}
 .card-actions{display:flex;gap:10px;width:min(100%,380px)}
 .card-actions button{flex:1;border-radius:14px;padding:14px;font-size:17px;font-weight:600;background:rgba(255,255,255,.92);color:#000}
 .card-actions button.alt{background:rgba(255,255,255,.2);color:#fff}
@@ -180,11 +181,12 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 #sheet.on{transform:none}
 .sheet-head{position:sticky;top:0;z-index:1;background:var(--bg);display:flex;align-items:center;justify-content:space-between;padding:14px 0 10px}
 .sheet-head h3{margin:0;font-size:17px;font-weight:600;flex:1;text-align:center}
-.sheet-head button{color:var(--accent);font-size:17px;min-width:64px;text-align:left}
+.sheet-head button{color:var(--accent);font-size:17px;min-width:64px;min-height:44px;text-align:left}
+.sheet-head .sp{min-width:64px}
 .sheet-head button.r{text-align:right;font-weight:600}
 .grab{width:36px;height:5px;border-radius:3px;background:var(--label3);margin:6px auto 0}
 .big-min{text-align:center;padding:18px 0 6px}
-.big-min b{font-size:64px;font-weight:300;font-variant-numeric:tabular-nums}
+.big-min b{font-family:var(--serif);font-size:64px;font-weight:400;font-variant-numeric:tabular-nums}
 .big-min small{font-size:17px;color:var(--label2);margin-left:4px}
 .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:6px 0 16px}
 .chip{background:var(--card);border-radius:18px;padding:8px 16px;font-size:15px;font-variant-numeric:tabular-nums}
@@ -204,7 +206,7 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 .alert button.d{color:var(--danger)}
 #toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 92px);transform:translate(-50%,20px);z-index:80;background:color-mix(in srgb,var(--label) 86%,transparent);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:15px;display:flex;gap:14px;align-items:center;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;white-space:nowrap}
 #toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
-#toast button{color:var(--accent);font-weight:600;filter:brightness(1.4)}
+#toast button{color:#c4542f;font-weight:600;min-height:32px;padding:0 4px}
 /* dusk */
 .legend b,.trio b,.statbig .tot b{font-family:var(--serif)}
 .trio b,.statbig .tot b{color:var(--gold)}
@@ -219,17 +221,18 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 .bgpick{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .wpt{position:relative}
 .bgt{position:relative;width:100%;aspect-ratio:3/4;border-radius:12px;overflow:hidden;background:var(--fill) center/cover no-repeat;display:flex;align-items:flex-end;box-shadow:inset 0 0 0 1px var(--sep)}
-.bgt span{width:100%;padding:16px 6px 6px;font-size:12px;color:#fff;text-align:left;background:linear-gradient(transparent,rgba(0,0,0,.6))}
+.bgt span{width:100%;padding:16px 6px 6px;font-size:13px;color:#fff;text-align:left;background:linear-gradient(transparent,rgba(0,0,0,.6))}
 .bgt.on{box-shadow:inset 0 0 0 3px var(--accent)}
 .bgt.add{align-items:center;justify-content:center;color:var(--accent);font-size:15px;font-weight:600;flex-direction:column;gap:4px;box-shadow:inset 0 0 0 1.5px var(--sep)}
 .bgt.add b{font-size:30px;font-weight:300;line-height:1}
+.wpdel::after{content:"";position:absolute;inset:-9px}
 .wpdel{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:15px;line-height:26px;text-align:center}
 .chk{color:var(--accent);font-weight:600;width:20px;text-align:right}
-.skycard::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(27,23,25,.42),rgba(27,23,25,.08) 62%),linear-gradient(0deg,rgba(27,23,25,.35),transparent 45%)}
+.skycard::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(20,15,17,.66),rgba(20,15,17,.42) 58%,rgba(20,15,17,.14)),linear-gradient(0deg,rgba(20,15,17,.4),transparent 50%)}
 .skycard .rings{position:relative;padding:16px 16px 34px}
 .skycard .legend b{color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.35)}
 .skycard .legend small{color:rgba(255,255,255,.75)}
-.seal{position:absolute;display:grid;place-items:center;font-family:var(--serif);font-weight:700;color:#fff;background:var(--s);border-radius:8px;width:46px;height:46px;font-size:25px;right:14px;top:12px;transform:rotate(-8deg);box-shadow:inset 0 0 0 2px rgba(255,236,210,.95),inset 0 0 0 3.5px var(--s);animation:stamp .35s cubic-bezier(.3,1.6,.5,1)}
+.seal{position:absolute;display:grid;place-items:center;font-family:var(--serif);font-weight:700;color:#fff;background:var(--seal);border-radius:8px;width:46px;height:46px;font-size:25px;right:14px;top:12px;transform:rotate(-8deg);box-shadow:inset 0 0 0 2px rgba(255,236,210,.95),inset 0 0 0 3.5px var(--seal);animation:stamp .35s cubic-bezier(.3,1.6,.5,1)}
 .qcard .seal{left:22px;top:24px;right:auto;width:56px;height:56px;font-size:30px;transform:rotate(-9deg);z-index:1}
 @keyframes stamp{from{transform:scale(1.8) rotate(-8deg);opacity:0}to{transform:rotate(-8deg);opacity:1}}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
@@ -264,7 +267,7 @@ main{max-width:600px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 8px) 
 
 <div id="cardModal" role="dialog" aria-modal="true" aria-label="打卡卡片"></div>
 <div class="scrim" id="scrim"></div>
-<div id="sheet" role="dialog" aria-modal="true"></div>
+<div id="sheet" role="dialog" aria-modal="true" inert></div>
 <div id="dialog" role="alertdialog" aria-modal="true"></div>
 <div id="toast" role="status"></div>
 <input type="file" id="photoInput" accept="image/*" multiple hidden>
@@ -458,14 +461,13 @@ async function delPhoto(id){
 function photoUrl(id){ const p=photos.find(x=>x.id===id); return p?p.url:null; }
 
 /* ---------- entries ---------- */
-function addEntry(k,m,src,day,extra){
-  const before=val(k);
-  S.entries.push(Object.assign({id:uid(),d:day||today(),k,m,t:Date.now(),src},extra||{}));
-  const after=val(k), pi=pickPoem();
-  if(!S.collected[pi]) S.collected[pi]=today();
-  S.last={pi,d:today()};
+function drawPoem(){ const pi=pickPoem(); if(!S.collected[pi]) S.collected[pi]=today(); S.last={pi,d:today()}; return pi; }
+function addEntry(k,m,src,day,extra,quiet){
+  const before=val(k), id=uid();
+  S.entries.push(Object.assign({id,d:day||today(),k,m,t:Date.now(),src},extra||{}));
+  const after=val(k), pi= quiet? null : drawPoem();
   save(); render();
-  return {k,m,before,after,pi};
+  return {id,k,m,before,after,pi};
 }
 
 /* ---------- dusk ---------- */
@@ -503,7 +505,7 @@ function render(){
   else if(tab==='skill') renderSkill();
   else renderLog();
 }
-const RING={l:'#e7d4f0',r:'#ffd27a',s:'#ff8a62'}, RLAB={l:'#efdcf5',r:'#ffe2a0',s:'#ffb59a'}; // lighter tones that read on the sky
+const RING={l:'#b893bc',r:'#efb446',s:'#ee8399'}, RLAB=RING; // the skill colours, a touch brighter for the photo
 function ringSVG(){
   const t=today(), R=[60,45,30], c=72; let s='<svg viewBox="0 0 144 144" aria-hidden="true">';
   ORDER.forEach((k,i)=>{
@@ -539,13 +541,13 @@ function renderFocus(){
   const r=118, circ=2*Math.PI*r;
   h+='<div class="face"><svg viewBox="0 0 260 260" aria-hidden="true"><circle cx="130" cy="130" r="'+r+'" fill="none" stroke="var(--fill)" stroke-width="8"/>'+(free?'':'<circle cx="130" cy="130" r="'+r+'" fill="none" stroke="'+SK[P.k].c+'" stroke-width="8" stroke-linecap="round" stroke-dasharray="'+circ+' '+circ+'" transform="rotate(-90 130 130)"/>')+'</svg><div class="t"><b>'+(free? '00:00' : String(P.focus).padStart(2,'0')+':00')+'</b><small>'+SK[P.k].name+(free? ' · 从 0 开始计时' : ' · 休息 '+P.rest+' 分钟')+'</small></div></div>';
   h+='<div class="today-sum">今天'+(ft.n? ' <b>'+ft.n+'</b> 个番茄 ·' : '')+' 专注 <b>'+fmtMin(ft.m)+'</b></div>';
+  h+='<div style="margin-top:16px"><button class="primary" id="startFocus">'+(free?'开始计时':'开始专注')+'</button></div>';
   if(!free){
     h+='<div class="card" style="margin-top:14px">';
     h+='<div class="row"><span class="grow">专注时长</span><span class="val">'+P.focus+' 分钟</span><span class="stepper"><button data-step="focus:-5" aria-label="减少专注时长">−</button><button data-step="focus:5" aria-label="增加专注时长">+</button></span></div>';
     h+='<div class="row"><span class="grow">短休息</span><span class="val">'+P.rest+' 分钟</span><span class="stepper"><button data-step="rest:-1" aria-label="减少短休息">−</button><button data-step="rest:1" aria-label="增加短休息">+</button></span></div>';
     h+='<div class="row"><span class="grow">长休息<br><small style="color:var(--label2);font-size:13px">每完成 4 个番茄</small></span><span class="val">'+P.long+' 分钟</span><span class="stepper"><button data-step="long:-5" aria-label="减少长休息">−</button><button data-step="long:5" aria-label="增加长休息">+</button></span></div></div>';
   }
-  h+='<div style="margin-top:22px"><button class="primary" id="startFocus">'+(free?'开始计时':'开始专注')+'</button></div>';
   h+='<div class="gf">'+(free? '计时到 3 小时会自动暂停，问你还在不在学。' : '专注时可以随时暂停，快结束时可以再加 5 分钟。')+' '+(wpList().length? '背景是你的壁纸和一句诗词。' : '到「记录 › 壁纸」添加照片，专注时就用它做背景。')+'</div>';
   $('v-focus').innerHTML=h;
 }
@@ -564,13 +566,13 @@ function radarSVG(){
   const lab={l:[cx,cy-R-30,'middle'], r:[cx+Math.cos(Math.PI/6)*R+6, cy+Math.sin(Math.PI/6)*R+30,'middle'], s:[cx-Math.cos(Math.PI/6)*R-6, cy+Math.sin(Math.PI/6)*R+30,'middle']};
   ORDER.forEach(k=>{ const [x,y,a]=lab[k];
     s+='<text x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" text-anchor="'+a+'" font-size="13" fill="var(--label2)" font-family="var(--ui)">'+SK[k].name+'</text>';
-    s+='<text x="'+x.toFixed(1)+'" y="'+(y+21).toFixed(1)+'" text-anchor="'+a+'" font-size="19" font-weight="600" fill="'+SK[k].c+'" font-family="var(--ui)" style="font-variant-numeric:tabular-nums">'+cur[k].toFixed(1)+'</text>'; });
+    s+='<text x="'+x.toFixed(1)+'" y="'+(y+21).toFixed(1)+'" text-anchor="'+a+'" font-size="19" font-weight="600" font-family="var(--serif)" fill="'+SK[k].c+'" font-family="var(--ui)" style="font-variant-numeric:tabular-nums">'+cur[k].toFixed(1)+'</text>'; });
   return s+'</svg>';
 }
 function renderSkill(){
   const a=avgVal(), i=realmOf(a), R=REALMS[i], nx=REALMS[i+1];
   const pct=nx? Math.max(0,Math.min(100,(a-R[0])/(nx[0]-R[0])*100)) : 100;
-  let h='<div class="lt">修为</div><div class="sub">阅读 · 听力 · 口语，每项满分 100</div>';
+  let h='<div class="lt">修为</div><div class="sub">听力 · 阅读 · 口语，每项满分 100</div>';
   h+='<div class="card realm"><span class="eyebrow">当前境界 · 综合 '+a.toFixed(1)+'</span><h2>'+R[1]+'</h2><p>'+R[2]+'</p>';
   h+='<div class="bar"><i style="width:'+pct.toFixed(1)+'%"></i></div><div class="meta"><span>'+R[0]+'</span><span>'+(nx? '下一境界「'+nx[1]+'」 '+nx[0] : '已至巅峰')+'</span></div></div>';
   h+='<div class="card radar" style="margin-top:12px">'+radarSVG()+'</div>';
@@ -756,10 +758,10 @@ function storageNote(){
 
 /* ---------- sheet / dialog / toast ---------- */
 let sheetKind=null;
-function openSheet(kind){ sheetKind=kind; drawSheet(); $('scrim').classList.add('on'); $('sheet').classList.add('on'); }
-function closeSheet(){ sheetKind=null; $('scrim').classList.remove('on'); $('sheet').classList.remove('on'); }
+function openSheet(kind){ sheetKind=kind; drawSheet(); $('scrim').classList.add('on'); $('sheet').classList.add('on'); $('sheet').inert=false; }
+function closeSheet(){ sheetKind=null; $('scrim').classList.remove('on'); $('sheet').classList.remove('on'); $('sheet').inert=true; }
 let addK='l', addM=15, addDay=0;
-function head(title,left,right){ return '<div class="grab"></div><div class="sheet-head"><button data-sheet="close">'+(left||'取消')+'</button><h3>'+title+'</h3><button class="r" data-sheet="ok">'+(right||'')+'</button></div>'; }
+function head(title,left,right){ return '<div class="grab"></div><div class="sheet-head">'+(left? '<button data-sheet="close">'+left+'</button>' : '<span class="sp"></span>')+'<h3>'+title+'</h3><button class="r" data-sheet="ok">'+(right||'')+'</button></div>'; }
 function stepRow(label,path,v,unit){ return '<div class="row"><span class="grow">'+label+'</span><span class="val">'+v+(unit||'')+'</span><span class="stepper"><button data-sstep="'+path+':-1" aria-label="减少'+label+'">−</button><button data-sstep="'+path+':1" aria-label="增加'+label+'">+</button></span></div>'; }
 function drawSheet(){
   let h='';
@@ -998,7 +1000,11 @@ document.addEventListener('click',e=>{
   if(ds.open){ openSheet(ds.open); return; }
   if(ds.sheet==='close'){ closeSheet(); return; }
   if(ds.sheet==='ok'){
-    if(sheetKind==='add'){ const day=dkey(addD(new Date(),-addDay)); const k=addK, m=addM; closeSheet(); const res=addEntry(k,m,'manual',day); showCard(res,false); }
+    if(sheetKind==='add'){ const day=dkey(addD(new Date(),-addDay)); const k=addK, m=addM; closeSheet();
+      const was=todayMet(), res=addEntry(k,m,'manual',day,null,true);
+      if(day===today() && !was && todayMet()){ res.pi=drawPoem(); save(); render(); showCard(res,false); }   // this entry met all three goals
+      else toast('已记录 '+SK[k].name+' '+m+' 分钟'+(day===today()?'':'（昨天）'),()=>{ S.entries=S.entries.filter(e=>e.id!==res.id); save(); render(); });
+    }
     else { closeSheet(); render(); }
     return;
   }
